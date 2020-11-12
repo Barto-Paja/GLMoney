@@ -21,6 +21,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    DataStructs.h \
     data.hpp \
     mainwindow.h
 
