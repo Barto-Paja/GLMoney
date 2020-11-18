@@ -5,6 +5,8 @@
 #include <QMessageBox>
 
 #include "data.hpp"
+#include "newpayeewindow.hpp"
+#include "reportmonthwindow.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,6 +39,10 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_actionDodaj_Nowego_atnika_triggered();
+
+    void on_actionRaport_roczny_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -44,5 +50,6 @@ private:
 
     void fillComboboxes();
     void reloadSubcategories(int index);
+    void reloadPayees();
 };
 #endif // MAINWINDOW_H

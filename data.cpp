@@ -42,7 +42,7 @@ QVector<Account> Data::accounts() const
     return m_accounts;
 }
 
-bool Data::addTransaction(const newTransaction &transaction)
+bool Data::addTransaction(const newTransaction &transaction, QString &error)
 {
     QSqlQuery query {m_db};
 
@@ -62,7 +62,28 @@ bool Data::addTransaction(const newTransaction &transaction)
     query.bindValue(":accountid",transaction.accountID);
     query.bindValue(":multiplicand",transaction.multiplicand);
 
-    qDebug() << transaction.amount;
+    if(query.exec())
+    {
+        m_db.commit();
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+}
+
+bool Data::addPayee(const QString &name, const QString description, QString &error)
+{
+    QSqlQuery query {m_db};
+
+    m_db.transaction();
+
+    query.prepare("INSERT INTO Payee ( name, description ) VALUES ( :name, :description )");
+    query.bindValue(":name", name);
+    query.bindValue(":description", description);
 
     if(query.exec())
     {
@@ -71,9 +92,86 @@ bool Data::addTransaction(const newTransaction &transaction)
     }
     else
     {
+        error = query.lastError().text();
         m_db.rollback();
         return false;
     }
+}
+
+bool Data::getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> &transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString & error)
+{
+    QSqlQuery query {m_db};
+    QString query_text {
+        "select SUM([Transaction].amount) as 'Balance', "
+        "strftime('%Y', [when]) as 'year', "
+        "strftime('%m', [when]) as 'month' "
+        "from [Transaction] "
+        "where multiplicand > 0 AND ([when] between '"+QString::number(start_year)+"-01-01' AND '"+QString::number(end_year)+"-12-31') "
+        "group by strftime('%m-%Y',  [when]) order by year,month ASC "
+    };
+
+    query.prepare(query_text);
+
+    qDebug() << query.lastQuery();
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            transactions_history_expanse.append(transactionsResume{
+                balance::expanse,
+                query.value("Balance").toDouble(),
+                query.value("year").toInt(),
+                query.value("month").toInt()
+            });
+        }
+    }
+    else
+    {
+        error = query.lastError().text();
+        return false;
+    }
+
+    query_text = (
+        "select SUM([Transaction].amount) as 'Balance', "
+        "strftime('%Y', [when]) as 'year', "
+        "strftime('%m', [when]) as 'month' "
+        "from [Transaction] "
+        "where multiplicand < 0 AND ([when] between '"+QString::number(start_year)+"-01-01' AND '"+QString::number(end_year)+"-12-31') "
+        "group by strftime('%m-%Y',  [when]) order by year,month ASC "
+        );
+
+    query.prepare(query_text);
+
+    qDebug() << query.lastQuery();
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            transactions_history_income.append(transactionsResume{
+                balance::income,
+                query.value("Balance").toDouble(),
+                query.value("year").toInt(),
+                query.value("month").toInt()
+            });
+        }
+
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        return false;
+    }
+
+}
+
+void Data::reloadPayee()
+{
+    m_payees.clear();
+
+    loadPayees();
 }
 
 bool Data::loadData()

@@ -62,6 +62,20 @@ void MainWindow::reloadSubcategories(int index)
 
 }
 
+void MainWindow::reloadPayees()
+{
+    ui->comboBox_payee->clear();
+
+    m_data.reloadPayee();
+
+    for(auto i : m_data.payees())
+    {
+        ui->comboBox_payee->addItem(i.name,i.id);
+    }
+
+    ui->comboBox_payee->update();
+}
+
 
 void MainWindow::on_comboBox_category_currentIndexChanged(int index)
 {
@@ -102,31 +116,76 @@ void MainWindow::on_checkBox_isIncome_stateChanged(int arg1)
 void MainWindow::on_pushButton_Commit_clicked()
 {
 
+    if(ui->lineEdit_amount->text().isEmpty())
+    {
+        QMessageBox msg;
+        msg.setIcon(QMessageBox::Critical);
+        msg.setText("Pole z kwotą nie może być puste!");
+        msg.addButton(QMessageBox::Ok);
+        msg.exec();
+
+        return;
+    }
+
+    QString error_msg;
+
     if(ui->checkBox_isIncome->isChecked())
     {
-        m_data.addTransaction(newTransaction{
-            ui->dateEdit->date(),
-            ui->comboBox_payee->currentData().toInt(),
-            QLocale::system().toDouble(ui->lineEdit_amount->text()),
-            ui->comboBox_subcategory->currentData().toInt(),
-            ui->comboBox_member->currentData().toInt(),
-            ui->comboBox_account->currentData().toInt(),
-            ui->textEdit->toPlainText(),
-            1
-        });
+        if(m_data.addTransaction(newTransaction{
+                                      ui->dateEdit->date(),
+                                      ui->comboBox_payee->currentData().toInt(),
+                                      QLocale::system().toDouble(ui->lineEdit_amount->text()),
+                                      ui->comboBox_subcategory->currentData().toInt(),
+                                      ui->comboBox_member->currentData().toInt(),
+                                      ui->comboBox_account->currentData().toInt(),
+                                      ui->textEdit->toPlainText(),
+                                      1
+                                  }, error_msg))
+        {
+            QMessageBox msg;
+            msg.setIcon(QMessageBox::Information);
+            msg.setText("Transakcja dodana pomyślnie!");
+            msg.addButton(QMessageBox::Ok);
+            msg.exec();
+        }
+        else
+        {
+            QMessageBox msg;
+            msg.setIcon(QMessageBox::Critical);
+            msg.setText("Dodanie transakcji nie powiodło się!\n"+error_msg);
+            msg.addButton(QMessageBox::Ok);
+            msg.exec();
+        }
     }
     else
     {
-        m_data.addTransaction(newTransaction{
-            ui->dateEdit->date(),
-            ui->comboBox_payee->currentData().toInt(),
-            QLocale::system().toDouble(ui->lineEdit_amount->text()),
-            ui->comboBox_subcategory->currentData().toInt(),
-            ui->comboBox_member->currentData().toInt(),
-            ui->comboBox_account->currentData().toInt(),
-            ui->textEdit->toPlainText(),
-            -1
-        });
+        if(m_data.addTransaction(
+                newTransaction
+                {
+                    ui->dateEdit->date(),
+                    ui->comboBox_payee->currentData().toInt(),
+                    QLocale::system().toDouble(ui->lineEdit_amount->text()),
+                    ui->comboBox_subcategory->currentData().toInt(),
+                    ui->comboBox_member->currentData().toInt(),
+                    ui->comboBox_account->currentData().toInt(),
+                    ui->textEdit->toPlainText(),
+                    -1
+                }, error_msg))
+        {
+            QMessageBox msg;
+            msg.setIcon(QMessageBox::Information);
+            msg.setText("Transakcja dodana pomyślnie!");
+            msg.addButton(QMessageBox::Ok);
+            msg.exec();
+        }
+        else
+        {
+            QMessageBox msg;
+            msg.setIcon(QMessageBox::Critical);
+            msg.setText("Dodanie transakcji nie powiodło się!\n"+error_msg);
+            msg.addButton(QMessageBox::Ok);
+            msg.exec();
+        }
     }
 }
 
@@ -152,4 +211,19 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_pushButton_3_clicked()
 {
     exit(0);
+}
+
+void MainWindow::on_actionDodaj_Nowego_atnika_triggered()
+{
+    NewPayeeWindow * dialog = new NewPayeeWindow(&m_data);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){reloadPayees();});
+    dialog->show();
+}
+
+void MainWindow::on_actionRaport_roczny_triggered()
+{
+    ReportMonthWindow * dialog = new ReportMonthWindow(&m_data);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }

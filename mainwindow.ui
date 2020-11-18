@@ -101,7 +101,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Słowniki</string>
+             <string>Ustawienia</string>
             </property>
            </widget>
           </item>
@@ -267,6 +267,9 @@
                   <pointsize>14</pointsize>
                  </font>
                 </property>
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
                 <property name="text">
                  <string>Płatnik / Płacący / Kontrahent</string>
                 </property>
@@ -290,6 +293,9 @@
                  <font>
                   <pointsize>14</pointsize>
                  </font>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="text">
                  <string>Kwota</string>
@@ -480,8 +486,44 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuMenu">
+    <property name="title">
+     <string>Menu</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuS_owniki">
+    <property name="title">
+     <string>Słowniki</string>
+    </property>
+    <widget class="QMenu" name="menuP_atnicy">
+     <property name="title">
+      <string>Płatnicy</string>
+     </property>
+     <addaction name="actionDodaj_Nowego_atnika"/>
+    </widget>
+    <addaction name="menuP_atnicy"/>
+   </widget>
+   <widget class="QMenu" name="menuStatystka">
+    <property name="title">
+     <string>Statystka</string>
+    </property>
+    <addaction name="actionRaport_roczny"/>
+   </widget>
+   <addaction name="menuMenu"/>
+   <addaction name="menuS_owniki"/>
+   <addaction name="menuStatystka"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionDodaj_Nowego_atnika">
+   <property name="text">
+    <string>Dodaj Nowego Płatnika</string>
+   </property>
+  </action>
+  <action name="actionRaport_roczny">
+   <property name="text">
+    <string>Raport roczny</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

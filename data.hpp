@@ -54,7 +54,12 @@ public:
     QVector<Transaction> transactions() const;
     QVector<Account> accounts() const;
 
-    bool addTransaction(const newTransaction &transaction);
+    bool addTransaction(const newTransaction &transaction, QString & error);
+    bool addPayee(const QString & name, const QString description, QString & error);
+
+    bool getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> & transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString &error);
+
+    void reloadPayee();
 
 signals:
 
