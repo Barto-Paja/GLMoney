@@ -1,25 +1,26 @@
-#include "newpayeewindow.hpp"
-#include "ui_newpayeewindow.h"
+#include "newmemberwindow.hpp"
+#include "ui_newmemberwindow.h"
 
 #include <QMessageBox>
 
-NewPayeeWindow::NewPayeeWindow(Data *data, QWidget *parent) :
-      QWidget(parent),
-    ui(new Ui::NewPayeeWindow),
+NewMemberWindow::NewMemberWindow(Data *data, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::NewMemberWindow),
     m_data(data)
 {
     ui->setupUi(this);
 }
 
-NewPayeeWindow::~NewPayeeWindow()
+NewMemberWindow::~NewMemberWindow()
 {
     delete ui;
 }
 
-void NewPayeeWindow::on_pushButton_Commit_clicked()
+void NewMemberWindow::on_pushButton_Commit_clicked()
 {
     QString error_msg;
-    if(ui->lineEdit_name->text().isEmpty())
+
+    if(ui->lineEdit->text().isEmpty())
     {
         QMessageBox msg;
         msg.setIcon(QMessageBox::Critical);
@@ -29,11 +30,11 @@ void NewPayeeWindow::on_pushButton_Commit_clicked()
     }
     else
     {
-        if(m_data->addPayee(ui->lineEdit_name->text(),ui->lineEdit_description->text(),error_msg))
+        if(m_data->addMember(ui->lineEdit->text(),error_msg))
         {
             QMessageBox msg;
             msg.setIcon(QMessageBox::Information);
-            msg.setText("Transakcja dodana pomyślnie!");
+            msg.setText(ui->lineEdit->text()+" dodane pomyślnie!");
             msg.addButton(QMessageBox::Ok);
             msg.exec();
 
@@ -48,4 +49,10 @@ void NewPayeeWindow::on_pushButton_Commit_clicked()
             msg.exec();
         }
     }
+
+}
+
+void NewMemberWindow::on_pushButton_Canel_clicked()
+{
+    close();
 }

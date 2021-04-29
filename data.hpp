@@ -9,6 +9,8 @@
 #include <QDate>
 #include <QMap>
 
+#include <QDebug>
+
 #include "DataStructs.h"
 
 struct Transaction {
@@ -56,10 +58,25 @@ public:
 
     bool addTransaction(const newTransaction &transaction, QString & error);
     bool addPayee(const QString & name, const QString description, QString & error);
+    bool addCategory(const QString & name, QString & error);
+    bool addSubcategory(const QString & name, int categoryID, QString & error);
+    bool addMember(const QString & name, QString & error);
+    bool addAccount(const QString & name, const QString & description, QString & error);
 
     bool getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> & transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString &error);
+    bool getTransactionsHistory(QDate start, QDate end, QVector<TransactionHistory> &transactions_history, QString & error);
 
     void reloadPayee();
+    void reloadCategory();
+    void reloadMember();
+    void reloadAccount();
+
+    bool commitHomeBudgetCalculation(HomeBudgetCalculation & home_calc, QVector<FixedExpanseCalculation> & fixed, QVector<OneOffExapanseCalculation> & oneoff, QString & error );
+    bool checkIsHomeBudgetCalculationExist(const QDate & date, HomeBudgetCalculation & home_calc, QString & error);
+    bool loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc, QVector<FixedExpanseCalculation> & fixed, QVector<OneOffExapanseCalculation> & oneoff, QString & error);
+
+    bool makeTransactionBetweenAccounts(const TransferBetweenAccounts & transferData, QString &error);
+    bool getResume(const QDate & date, QVector<CategoryResume> & resumes, QString & error);
 
 signals:
 

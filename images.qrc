@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/add-folder.png</file>
+        <file>images/man.png</file>
+        <file>images/man_1.png</file>
+        <file>images/progress-report.png</file>
+        <file>images/statistics.png</file>
+        <file>images/dollar-symbol.png</file>
+        <file>images/data-spreadsheet.png</file>
+        <file>images/diskette.png</file>
+        <file>images/transfer-arrows.png</file>
+        <file>images/minus-square.png</file>
+        <file>images/plus-sign.png</file>
+    </qresource>
+</RCC>

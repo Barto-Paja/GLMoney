@@ -19,6 +19,8 @@ public:
 private slots:
     void on_pushButton_Commit_clicked();
 
+    void on_pushButton_canel_clicked();
+
 private:
     Ui::NewPayeeWindow *ui;
 

@@ -98,6 +98,110 @@ bool Data::addPayee(const QString &name, const QString description, QString &err
     }
 }
 
+bool Data::addCategory(const QString &name, QString &error)
+{
+    QSqlQuery query {m_db};
+    QString query_text {
+      "INSERT INTO Category ( name ) VALUES ( :name ) "
+    };
+
+     m_db.transaction();
+
+     query.prepare(query_text);
+     query.bindValue(":name",name);
+
+     if(query.exec())
+     {
+         m_db.commit();
+         return true;
+     }
+     else
+     {
+         error = query.lastError().text();
+         m_db.rollback();
+         return false;
+     }
+}
+
+bool Data::addSubcategory(const QString &name, int categoryID, QString &error)
+{
+    QSqlQuery query { m_db };
+    QString query_text {
+        "INSERT INTO Subcategory ( name, category_id ) VALUES ( :name, :catID ) "
+    };
+
+    m_db.transaction();
+
+    query.prepare(query_text);
+    query.bindValue(":name",name);
+    query.bindValue(":catID", categoryID);
+
+    if(query.exec())
+    {
+        m_db.commit();
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+}
+
+bool Data::addMember(const QString &name, QString &error)
+{
+    QSqlQuery query { m_db};
+    QString query_text {
+        "INSERT INTO Member ( name ) VALUES ( :name ) "
+    };
+
+    m_db.transaction();
+
+    query.prepare(query_text);
+    query.bindValue(":name",name);
+
+    if(query.exec())
+    {
+        m_db.commit();
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+}
+
+bool Data::addAccount(const QString &name, const QString &description, QString &error)
+{
+    QSqlQuery query {m_db};
+    QString query_text {
+        "INSERT INTO Account ( name, description ) VALUES ( :name, :description ) "
+    };
+
+    m_db.transaction();
+
+    query.prepare(query_text);
+    query.bindValue(":name",name);
+    query.bindValue(":description",description);
+
+    if(query.exec())
+    {
+        m_db.commit();
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+}
+
 bool Data::getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> &transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString & error)
 {
     QSqlQuery query {m_db};
@@ -167,11 +271,406 @@ bool Data::getTransactionsResume(int start_year, int end_year, QVector<transacti
 
 }
 
+bool Data::getTransactionsHistory(QDate start, QDate end, QVector<TransactionHistory> &transactions_history, QString &error)
+{
+    QSqlQuery query {m_db};
+
+    QString query_text{"SELECT transaction_id, [when] as date, Payee.name as payee, "
+        "( amount * multiplicand ) as amount, "
+        "Category.name  as category, Subcategory.name as subcategory, "
+        "Member.name as member, "
+        "note, Account.name as account  FROM [Transaction] "
+        "INNER JOIN Payee ON Payee.payee_id = [Transaction].payee_id "
+        "INNER JOIN Member ON Member.member_id = [Transaction].member_id "
+        "INNER JOIN Subcategory ON Subcategory.subcategory_id = [Transaction].category_id "
+        "INNER JOIN Category ON Category.category_id = Subcategory.category_id "
+        "INNER JOIN Account ON  Account.account_id = [Transaction].acount_id "
+        "WHERE ([when] BETWEEN '"+start.toString("yyyy-MM-dd")+"' AND '"+end.toString("yyyy-MM-dd")+"') "
+        "ORDER BY [when] DESC"
+    };
+
+    query.prepare(query_text);
+    query.bindValue(":start_date",start.toString("yyyy-MM-dd"));
+    query.bindValue(":end_date",end.toString("yyyy-MM-dd"));
+
+    qDebug() << query.lastQuery() << start.toString("yyyy-MM-dd") << end.toString("yyyy-MM-dd");
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            transactions_history.append(TransactionHistory{
+                query.value("transaction_id").toInt(),
+                query.value("amount").toDouble(),
+                query.value("date").toDate(),
+                query.value("payee").toString(),
+                query.value("category").toString(),
+                query.value("subcategory").toString(),
+                query.value("member").toString(),
+                query.value("note").toString(),
+                query.value("account").toString()
+            });
+        }
+
+        return true;
+    }
+    else
+    {
+        error = query.lastError().text();
+        qDebug() << error;
+        return false;
+    }
+
+}
+
 void Data::reloadPayee()
 {
     m_payees.clear();
 
     loadPayees();
+}
+
+void Data::reloadCategory()
+{
+    m_categories.clear();
+    m_subCategories.clear();
+
+    loadCategories();
+}
+
+void Data::reloadMember()
+{
+    m_members.clear();
+
+    loadMembers();
+}
+
+void Data::reloadAccount()
+{
+    m_accounts.clear();
+
+    loadAccounts();
+}
+
+bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector<FixedExpanseCalculation> &fixed, QVector<OneOffExapanseCalculation> &oneoff, QString &error)
+{
+    QSqlQuery query {m_db};
+    m_db.transaction();
+
+    QString queryText;
+    if(!home_calc.isValid)
+    {
+        queryText =
+            "INSERT INTO Home_budget_calculation ( period, declared_income ) "
+            " VALUES ( '" +
+            home_calc.date.toString("yyyy-MM-dd") + "', "
+            + QString::number(home_calc.declaredIncome) + ") "
+        ;
+
+        query.prepare(queryText);
+        if(!query.exec())
+        {
+            m_db.rollback();
+            return false;
+        }
+
+        checkIsHomeBudgetCalculationExist(home_calc.date,home_calc,error);
+
+    }
+
+
+        for(auto i : fixed)
+        {
+            queryText = "INSERT INTO Fixed_expense ( category_id, amount, home_budget_calculation ) "
+                        "VALUES "
+                        "( :category_id, :amount, :home_budget_calculation )";
+
+            query.prepare(queryText);
+            query.bindValue(":category_id",i.categoryID);
+            query.bindValue(":amount",i.amount);
+            query.bindValue(":home_budget_calculation",home_calc.id);
+
+            if(query.exec())
+            {
+
+            }
+            else
+            {
+                m_db.rollback();
+                return false;
+            }
+
+        }
+
+    for(auto i : oneoff)
+    {
+        queryText = "INSERT INTO One_off_expense ( name, amount, home_budget_id ) "
+                    "VALUES "
+                    "( :name, :amount, :home_budget_id )";
+
+        query.prepare(queryText);
+        query.bindValue(":name",i.name);
+        query.bindValue(":amount",i.amount);
+        query.bindValue(":home_budget_id",home_calc.id);
+
+        if(query.exec())
+        {
+
+        }
+        else
+        {
+            m_db.rollback();
+            return false;
+        }
+    }
+
+
+
+    m_db.commit();
+    return true;
+
+    qDebug() << query.lastError().text() << "\n" << query.lastQuery();
+    return false;
+}
+
+bool Data::checkIsHomeBudgetCalculationExist(const QDate &date, HomeBudgetCalculation &home_calc, QString &error)
+{
+    QSqlQuery query {m_db};
+
+    QString queryText = "SELECT home_budget_calculation_id, period, declared_income "
+                        "FROM Home_budget_calculation "
+                        "WHERE (period BETWEEN '"+date.toString("yyyy-MM-dd")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
+                        "LIMIT 1";
+    query.prepare(queryText);
+
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            home_calc.id = query.value("home_budget_calculation_id").toInt();
+            home_calc.date = query.value("period").toDate();
+            home_calc.declaredIncome = query.value("declared_income").toDouble();
+            home_calc.isValid = true;
+            return true;
+        }
+        else
+        {
+            home_calc = HomeBudgetCalculation();
+        }
+    }
+    else
+    {
+        home_calc = HomeBudgetCalculation();
+        error = query.lastError().text();
+    }
+
+    return false;
+}
+
+bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<FixedExpanseCalculation> &fixed, QVector<OneOffExapanseCalculation> &oneoff, QString &error)
+{
+    QSqlQuery query {m_db};
+    QString queryText { "SELECT fe.fixed_expense_id, fe.category_id, fe.amount, fe.home_budget_calculation, c.name "
+                        "FROM Fixed_expense fe "
+                        "inner join category c on c.category_id = fe.category_id "
+                        "WHERE home_budget_calculation = :home_budget_calculation" };
+    query.prepare(queryText);
+    query.bindValue(":home_budget_calculation",hbc.id);
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            fixed.append(FixedExpanseCalculation{
+                             query.value("fixed_expense_id").toInt(),
+                             query.value("home_budget_calculation").toInt(),
+                             query.value("category_id").toInt(),
+                             query.value("amount").toDouble(),
+                             query.value("name").toString()
+                         });
+        }
+    }
+    else
+    {
+        error = query.lastError().text();
+        return false;
+    }
+
+    queryText = "SELECT one_of_expense_id, name, amount, home_budget_id FROM One_off_expense "
+                "WHERE home_budget_id = :home_budget_id";
+
+    query.prepare(queryText);
+    query.bindValue(":home_budget_id",hbc.id);
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            oneoff.append(OneOffExapanseCalculation{
+                             query.value("one_of_expense_id").toInt(),
+                             query.value("home_budget_id").toInt(),
+                             query.value("amount").toDouble(),
+                             query.value("name").toString()
+                          });
+        }
+    }
+    else
+    {
+        error = query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+bool Data::makeTransactionBetweenAccounts(const TransferBetweenAccounts & transferData, QString &error)
+{
+    if(!addTransaction(newTransaction{
+                       transferData.date,
+                       transferData.sourcePayeeMirror,
+                       transferData.amount,
+                       transferData.targetSubcategory,
+                       transferData.memberID,
+                       transferData.sourceID,
+                       "Transfer środków pomiędzy kontami",
+                       -1
+                   }, error))
+    {
+        return false;
+    }
+
+    return addTransaction(newTransaction{
+                              transferData.date,
+                              transferData.targetPayeeMirror,
+                              transferData.amount,
+                              transferData.sourceSubcategory,
+                              transferData.memberID,
+                              transferData.targetID,
+                              "Transfer środków pomiędzy kontami",
+                              1
+                          }, error);
+}
+
+bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QString &error)
+{
+    QString query_text {
+        "SELECT category_id, name FROM Category"
+    };
+
+    QSqlQuery query     { m_db };
+    QSqlQuery query2    { m_db };
+
+    query.prepare(query_text);
+
+    if(query.exec())
+    {
+        while(query.next())
+        {
+            CategoryResume resume;
+            int categoryID { 0 };
+
+            resume.categoryName = query.value("name").toString();
+            categoryID = query.value("category_id").toInt();
+
+            query_text =
+                    "select sum(t.amount) as amount from [Transaction] t "
+                    "inner join subcategory sc on t.category_id = sc.subcategory_id "
+                    "left outer join category c on sc.category_id = c.category_id "
+                    "where t.multiplicand = -1 "
+                    "AND (t.[when] BETWEEN '"+date.toString("yyyy-MM-dd")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
+                    "AND c.category_id = " + QString::number(categoryID);
+
+            qDebug() << query_text;
+
+            query2.prepare(query_text);
+
+            if(query2.exec())
+            {
+                if(query2.next())
+                {
+                    resume.calculatedExpense = query2.value("amount").toDouble();
+                }
+            }
+            else
+            {
+                qDebug() << query2.lastError();
+            }
+
+            query_text = "select home_budget_calculation_id from home_budget_calculation hbd where hbd.period = "
+            "'"+date.toString("yyyy-MM-dd")+"'";
+
+            qDebug() << query_text;
+
+            query2.prepare(query_text);
+
+            int homeBudgetID { 0 };
+
+            if(query2.exec())
+            {
+                if(query2.next())
+                {
+                    homeBudgetID = query2.value("home_budget_calculation_id").toInt();
+                }
+            }
+            else
+            {
+                qDebug() << query2.lastError();
+            }
+
+            query_text = "SELECT sum(amount) as amount from Fixed_expense "
+                         "WHERE category_id = " + QString::number(categoryID) + " "
+                         "AND home_budget_calculation = " + QString::number(homeBudgetID);
+
+            double fixedExpense  { 0.00 };
+            double oneOffExpense { 0.00 };
+
+            qDebug() << query_text;
+
+            query2.prepare(query_text);
+
+            if(query2.exec())
+            {
+                if(query2.next())
+                {
+                    fixedExpense = query2.value("amount").toDouble();
+                }
+            }
+            else
+            {
+                qDebug() << query2.lastError();
+            }
+
+            query_text = "SELECT sum(amount) as amount from One_off_expense "
+                         "WHERE home_budget_id = " + QString::number(homeBudgetID);
+
+            qDebug() << query_text;
+
+            query2.prepare(query_text);
+
+            if(query2.exec())
+            {
+                if(query2.next())
+                {
+                    oneOffExpense = query2.value("amount").toDouble();
+                }
+            }
+            else
+            {
+                qDebug() << query2.lastError();
+            }
+
+            resume.plannedExpense = fixedExpense + oneOffExpense;
+
+            resumes.push_back(resume);
+
+        }
+    }
+    else
+    {
+        qDebug() << query.lastError();
+    }
+
+    return true;
 }
 
 bool Data::loadData()

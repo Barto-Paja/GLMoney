@@ -1,229 +1,28 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
-#include <QLocale>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    ui->calendarWidget->hide();
-    ui->lineEdit_amount->setStyleSheet("background-color: #F0685B; color: #57201B");
-    ui->dateEdit->setDate(QDate::currentDate());
-    ui->lineEdit_amount->setValidator(new QDoubleValidator(0,1000000.00,2,this));
+    QMainWindow::setWindowState(Qt::WindowMaximized);
 
-    fillComboboxes();
+    ui->widget_homebudget = new HomeBudget_Form(&m_data,ui->widget_homebudget);
+    connect(qobject_cast<HomeBudget_Form*>(ui->widget_homebudget),&HomeBudget_Form::back,this,[&](){ui->stackedWidget->setCurrentIndex(0);});
+
+    ui->widget_mainMenu = new MainMenu(ui->widget_mainMenu);
+    connect(qobject_cast<MainMenu*>(ui->widget_mainMenu),&MainMenu::menuItem,this,[&](int index){ui->stackedWidget->setCurrentIndex(index);});
+    connect(qobject_cast<MainMenu*>(ui->widget_mainMenu),&MainMenu::quit,this,[&](){exit(0);});
+
+    ui->widget_notesIncomeAndExpense = new IncomesAndExpenses_Form(&m_data,ui->widget_notesIncomeAndExpense);
+    connect(qobject_cast<IncomesAndExpenses_Form*>(ui->widget_notesIncomeAndExpense),&IncomesAndExpenses_Form::back,this,[&](){ui->stackedWidget->setCurrentIndex(0);});
+
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::fillComboboxes()
-{
-    for(auto i : m_data.accounts())
-    {
-        ui->comboBox_account->addItem(i.name,i.id);
-    }
-
-    for(auto i : m_data.members())
-    {
-        ui->comboBox_member->addItem(i.name,i.id);
-    }
-
-    for(auto i : m_data.payees())
-    {
-        ui->comboBox_payee->addItem(i.name,i.id);
-    }
-
-    for(auto i : m_data.categories())
-    {
-        ui->comboBox_category->addItem(i.name,i.id);
-    }
-}
-
-void MainWindow::reloadSubcategories(int index)
-{
-    ui->comboBox_subcategory->clear();
-
-    if(m_data.subCategories().size() > 0)
-    {
-        for(auto i : m_data.subCategories(index+1))
-        {
-            ui->comboBox_subcategory->addItem(i.name,i.id);
-        }
-
-        ui->comboBox_subcategory->update();
-    }
-
-}
-
-void MainWindow::reloadPayees()
-{
-    ui->comboBox_payee->clear();
-
-    m_data.reloadPayee();
-
-    for(auto i : m_data.payees())
-    {
-        ui->comboBox_payee->addItem(i.name,i.id);
-    }
-
-    ui->comboBox_payee->update();
-}
-
-
-void MainWindow::on_comboBox_category_currentIndexChanged(int index)
-{
-    reloadSubcategories(index);
-}
-
-void MainWindow::on_pushButton_4_clicked()
-{
-    if(ui->calendarWidget->isHidden())
-    {
-        ui->calendarWidget->show();
-    }
-    else
-    {
-        ui->calendarWidget->hide();
-    }
-}
-
-void MainWindow::on_calendarWidget_clicked(const QDate &date)
-{
-    ui->dateEdit->setDate(date);
-}
-
-void MainWindow::on_checkBox_isIncome_stateChanged(int arg1)
-{
-    Q_UNUSED(arg1)
-
-    if(ui->checkBox_isIncome->isChecked())
-    {
-        ui->lineEdit_amount->setStyleSheet("background-color: #49F249; color: #227022");
-    }
-    else
-    {
-        ui->lineEdit_amount->setStyleSheet("background-color: #F0685B; color: #57201B");
-    }
-}
-
-void MainWindow::on_pushButton_Commit_clicked()
-{
-
-    if(ui->lineEdit_amount->text().isEmpty())
-    {
-        QMessageBox msg;
-        msg.setIcon(QMessageBox::Critical);
-        msg.setText("Pole z kwotą nie może być puste!");
-        msg.addButton(QMessageBox::Ok);
-        msg.exec();
-
-        return;
-    }
-
-    QString error_msg;
-
-    if(ui->checkBox_isIncome->isChecked())
-    {
-        if(m_data.addTransaction(newTransaction{
-                                      ui->dateEdit->date(),
-                                      ui->comboBox_payee->currentData().toInt(),
-                                      QLocale::system().toDouble(ui->lineEdit_amount->text()),
-                                      ui->comboBox_subcategory->currentData().toInt(),
-                                      ui->comboBox_member->currentData().toInt(),
-                                      ui->comboBox_account->currentData().toInt(),
-                                      ui->textEdit->toPlainText(),
-                                      1
-                                  }, error_msg))
-        {
-            QMessageBox msg;
-            msg.setIcon(QMessageBox::Information);
-            msg.setText("Transakcja dodana pomyślnie!");
-            msg.addButton(QMessageBox::Ok);
-            msg.exec();
-        }
-        else
-        {
-            QMessageBox msg;
-            msg.setIcon(QMessageBox::Critical);
-            msg.setText("Dodanie transakcji nie powiodło się!\n"+error_msg);
-            msg.addButton(QMessageBox::Ok);
-            msg.exec();
-        }
-    }
-    else
-    {
-        if(m_data.addTransaction(
-                newTransaction
-                {
-                    ui->dateEdit->date(),
-                    ui->comboBox_payee->currentData().toInt(),
-                    QLocale::system().toDouble(ui->lineEdit_amount->text()),
-                    ui->comboBox_subcategory->currentData().toInt(),
-                    ui->comboBox_member->currentData().toInt(),
-                    ui->comboBox_account->currentData().toInt(),
-                    ui->textEdit->toPlainText(),
-                    -1
-                }, error_msg))
-        {
-            QMessageBox msg;
-            msg.setIcon(QMessageBox::Information);
-            msg.setText("Transakcja dodana pomyślnie!");
-            msg.addButton(QMessageBox::Ok);
-            msg.exec();
-        }
-        else
-        {
-            QMessageBox msg;
-            msg.setIcon(QMessageBox::Critical);
-            msg.setText("Dodanie transakcji nie powiodło się!\n"+error_msg);
-            msg.addButton(QMessageBox::Ok);
-            msg.exec();
-        }
-    }
-}
-
-void MainWindow::on_pushButton_Back_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(0);
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(1);
-}
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    QMessageBox msg;
-    msg.setIcon(QMessageBox::Information);
-    msg.setText("Funkcjonalnosć zostanie utworzona wkrótce.");
-    msg.addButton(QMessageBox::Ok);
-    msg.exec();
-}
-
-void MainWindow::on_pushButton_3_clicked()
-{
-    exit(0);
-}
-
-void MainWindow::on_actionDodaj_Nowego_atnika_triggered()
-{
-    NewPayeeWindow * dialog = new NewPayeeWindow(&m_data);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){reloadPayees();});
-    dialog->show();
-}
-
-void MainWindow::on_actionRaport_roczny_triggered()
-{
-    ReportMonthWindow * dialog = new ReportMonthWindow(&m_data);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
 }
