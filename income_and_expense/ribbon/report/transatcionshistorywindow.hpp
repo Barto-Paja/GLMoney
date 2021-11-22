@@ -19,6 +19,8 @@ public:
 private slots:
     void on_dateEdit_from_userDateChanged(const QDate &date);
 
+    void on_comboBox_accounts_currentIndexChanged(int index);
+
 private:
     Ui::TransatcionsHistoryWindow *ui;
 
@@ -26,6 +28,9 @@ private:
     QVector<TransactionHistory> m_transactions;
 
     bool fillTable();
+    void fillCombobox();
+    long currentAccountSelected { 0 };
+    long maxAccountId { 0 };
 };
 
 #endif // TRANSATCIONSHISTORYWINDOW_HPP

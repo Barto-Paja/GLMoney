@@ -66,9 +66,10 @@ struct TransactionHistory
     QString member;
     QString note;
     QString account;
+    int accountID;
 
     TransactionHistory(int id_v, double amount_v, QDate date_v, QString payee_v,
-                       QString category_v, QString subcategory_v, QString member_v, QString note_v, QString account_v)
+                       QString category_v, QString subcategory_v, QString member_v, QString note_v, QString account_v, int account_id)
         : id            { id_v },
           amount        { amount_v },
           date          { date_v },
@@ -77,7 +78,8 @@ struct TransactionHistory
           subcategory   { subcategory_v },
           member        { member_v },
           note          { note_v},
-          account       { account_v}
+          account       { account_v},
+          accountID     { account_id}
     {}
 };
 
@@ -121,13 +123,26 @@ struct OneOffExapanseCalculation
     int homeBudgetCalculationID { 0 };
     double amount {0.00};
     QString name;
+    int categoryID {0};
+    QString category_name;
 
     OneOffExapanseCalculation(int id_v, int homebudgetcacl_id_v, double amount_v,
-                              const QString & name_v) :
+                              const QString & name_v, const int & category) :
         id { id_v },
         homeBudgetCalculationID { homebudgetcacl_id_v },
         amount { amount_v },
-        name { name_v }
+        name { name_v },
+        categoryID { category }
+    {}
+
+    OneOffExapanseCalculation(int id_v, int homebudgetcacl_id_v, double amount_v,
+                              const QString & name_v, const int & category, const QString & name_cat) :
+        id { id_v },
+        homeBudgetCalculationID { homebudgetcacl_id_v },
+        amount { amount_v },
+        name { name_v },
+        categoryID { category },
+        category_name { name_cat }
     {}
 };
 

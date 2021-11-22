@@ -12,6 +12,7 @@ TransatcionsHistoryWindow::TransatcionsHistoryWindow(Data *data, QWidget *parent
     ui->dateEdit_from->setDate(QDate{ui->dateEdit_from->date().year(),
                                      ui->dateEdit_from->date().month(),1});
 
+    fillCombobox();
     fillTable();
 
 }
@@ -23,6 +24,9 @@ TransatcionsHistoryWindow::~TransatcionsHistoryWindow()
 
 bool TransatcionsHistoryWindow::fillTable()
 {
+    ui->tableWidget->setRowCount(0);
+    m_transactions.clear();
+
     QString error_msg;
 
     QDate end = {ui->dateEdit_from->date().year(), ui->dateEdit_from->date().month(), ui->dateEdit_from->date().daysInMonth()};
@@ -34,8 +38,16 @@ bool TransatcionsHistoryWindow::fillTable()
     qDebug() << m_transactions.size();
 
     int index = 0;
-    for(auto i : m_transactions)
+    for(const auto & i : qAsConst(m_transactions))
     {
+        if(currentAccountSelected != maxAccountId)
+        {
+            if(currentAccountSelected != i.accountID)
+            {
+                continue;
+            }
+        }
+
         QTableWidgetItem *newItem;
 
         // ID
@@ -65,10 +77,24 @@ bool TransatcionsHistoryWindow::fillTable()
 
         index++;
     }
-
+    ui->tableWidget->setRowCount(index);
     ui->tableWidget->update();
 
     return true;
+}
+
+void TransatcionsHistoryWindow::fillCombobox()
+{
+    auto v { 0 };
+
+    for(auto & i : m_data->accounts())
+    {
+        ui->comboBox_accounts->addItem(i.name,i.id);
+        v = i.id;
+    }
+
+    ui->comboBox_accounts->addItem("Wszystkie",v+1);
+    maxAccountId = v+1;
 }
 
 void TransatcionsHistoryWindow::on_dateEdit_from_userDateChanged(const QDate &date)
@@ -77,5 +103,12 @@ void TransatcionsHistoryWindow::on_dateEdit_from_userDateChanged(const QDate &da
 
     ui->tableWidget->setRowCount(0);
     m_transactions.clear();
+    fillTable();
+}
+
+void TransatcionsHistoryWindow::on_comboBox_accounts_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+    currentAccountSelected = ui->comboBox_accounts->currentData().toInt();
     fillTable();
 }

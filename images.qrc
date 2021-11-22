@@ -11,5 +11,6 @@
         <file>images/transfer-arrows.png</file>
         <file>images/minus-square.png</file>
         <file>images/plus-sign.png</file>
+        <file>images/import.png</file>
     </qresource>
 </RCC>

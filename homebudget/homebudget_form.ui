@@ -226,6 +226,11 @@
             <string>Kwota</string>
            </property>
           </column>
+          <column>
+           <property name="text">
+            <string>Kategoria</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>
@@ -283,6 +288,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="lineEdit_expanseName"/>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QComboBox" name="comboBox_categoryOneOffExpense"/>
           </item>
          </layout>
         </item>

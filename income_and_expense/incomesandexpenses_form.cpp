@@ -305,3 +305,9 @@ void IncomesAndExpenses_Form::reloadMembers()
     ui->comboBox_member->update();
 }
 
+void IncomesAndExpenses_Form::on_toolButton_ImportTransactions_clicked()
+{
+    ImportCSVWindow * dialog = new ImportCSVWindow(m_data,this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+}

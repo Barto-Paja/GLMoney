@@ -105,11 +105,11 @@ void MakeTransactionsBetweenAccounts::on_pushButton_Commit_clicked()
     TransferBetweenAccounts t;
 
     t.sourceID = ui->comboBox_source->currentData().toInt();
-    t.sourcePayeeMirror = ui->comboBox_source_payee->currentData().toInt();
+    t.sourcePayeeMirror = ui->comboBox_target_payee->currentData().toInt();
     t.sourceSubcategory = ui->comboBox_source_subcategory->currentData().toInt();
 
     t.targetID = ui->comboBox_target->currentData().toInt();
-    t.targetPayeeMirror = ui->comboBox_target_payee->currentData().toInt();
+    t.targetPayeeMirror = ui->comboBox_source_payee->currentData().toInt();
     t.targetSubcategory = ui->comboBox_target_subcategory->currentData().toInt();
 
     t.date = ui->calendarWidget->selectedDate();

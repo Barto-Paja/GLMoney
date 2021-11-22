@@ -42,6 +42,25 @@ QVector<Account> Data::accounts() const
     return m_accounts;
 }
 
+bool Data::AddTransactions(const QVector<newTransaction> &transactions, QString &error)
+{
+    QString msg_error = "Transakcja nr:  nie powiodła się:\n";
+
+    for(const auto & transaction : transactions)
+    {
+        QString error_t;
+        if(!addTransaction(transaction,error_t))
+        {
+            msg_error += error_t;
+            error = msg_error;
+            qDebug() << msg_error;
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool Data::addTransaction(const newTransaction &transaction, QString &error)
 {
     QSqlQuery query {m_db};
@@ -275,10 +294,28 @@ bool Data::getTransactionsHistory(QDate start, QDate end, QVector<TransactionHis
 {
     QSqlQuery query {m_db};
 
-    QString query_text{"SELECT transaction_id, [when] as date, Payee.name as payee, "
+    QString query_text {
+        "select count(*) as counter from [Transaction]"
+    };
+
+    query.prepare(query_text);
+    if(query.exec() && query.next())
+    {
+        if( query.value("counter").toInt() == transactions_history.size())
+        {
+            return true;
+        }
+        else
+        {
+            transactions_history.clear();
+        }
+    }
+
+
+    query_text = "SELECT transaction_id, [when] as date, Payee.name as payee, "
         "( amount * multiplicand ) as amount, "
         "Category.name  as category, Subcategory.name as subcategory, "
-        "Member.name as member, "
+        "Member.name as member, [Transaction].acount_id as account_id, "
         "note, Account.name as account  FROM [Transaction] "
         "INNER JOIN Payee ON Payee.payee_id = [Transaction].payee_id "
         "INNER JOIN Member ON Member.member_id = [Transaction].member_id "
@@ -286,8 +323,7 @@ bool Data::getTransactionsHistory(QDate start, QDate end, QVector<TransactionHis
         "INNER JOIN Category ON Category.category_id = Subcategory.category_id "
         "INNER JOIN Account ON  Account.account_id = [Transaction].acount_id "
         "WHERE ([when] BETWEEN '"+start.toString("yyyy-MM-dd")+"' AND '"+end.toString("yyyy-MM-dd")+"') "
-        "ORDER BY [when] DESC"
-    };
+        "ORDER BY [when] DESC";
 
     query.prepare(query_text);
     query.bindValue(":start_date",start.toString("yyyy-MM-dd"));
@@ -308,7 +344,8 @@ bool Data::getTransactionsHistory(QDate start, QDate end, QVector<TransactionHis
                 query.value("subcategory").toString(),
                 query.value("member").toString(),
                 query.value("note").toString(),
-                query.value("account").toString()
+                query.value("account").toString(),
+                query.value("account_id").toInt()
             });
         }
 
@@ -370,6 +407,7 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
         query.prepare(queryText);
         if(!query.exec())
         {
+            error = query.lastError().text() + "\n" + query.lastQuery();
             m_db.rollback();
             return false;
         }
@@ -379,16 +417,17 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
     }
 
 
-        for(auto i : fixed)
+        for(const auto &i : fixed)
         {
-            queryText = "INSERT INTO Fixed_expense ( category_id, amount, home_budget_calculation ) "
+            queryText = "INSERT INTO Fixed_expense ( category_id, amount, home_budget_calculation, category_id ) "
                         "VALUES "
-                        "( :category_id, :amount, :home_budget_calculation )";
+                        "( :category_id, :amount, :home_budget_calculation, :category_id )";
 
             query.prepare(queryText);
             query.bindValue(":category_id",i.categoryID);
             query.bindValue(":amount",i.amount);
             query.bindValue(":home_budget_calculation",home_calc.id);
+            query.bindValue(":category_id",i.categoryID);
 
             if(query.exec())
             {
@@ -396,15 +435,16 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
             }
             else
             {
+                error = query.lastError().text() + "\n" + query.lastQuery();
                 m_db.rollback();
                 return false;
             }
 
         }
 
-    for(auto i : oneoff)
+    for(const auto &i : oneoff)
     {
-        queryText = "INSERT INTO One_off_expense ( name, amount, home_budget_id ) "
+        queryText = "INSERT INTO One_off_expense ( name, amount, home_budget_id, category_id ) "
                     "VALUES "
                     "( :name, :amount, :home_budget_id )";
 
@@ -412,6 +452,7 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
         query.bindValue(":name",i.name);
         query.bindValue(":amount",i.amount);
         query.bindValue(":home_budget_id",home_calc.id);
+        query.bindValue(":category_id",i.categoryID);
 
         if(query.exec())
         {
@@ -419,18 +460,14 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
         }
         else
         {
+            error = query.lastError().text() + "\n" + query.lastQuery();
             m_db.rollback();
             return false;
         }
     }
 
-
-
     m_db.commit();
     return true;
-
-    qDebug() << query.lastError().text() << "\n" << query.lastQuery();
-    return false;
 }
 
 bool Data::checkIsHomeBudgetCalculationExist(const QDate &date, HomeBudgetCalculation &home_calc, QString &error)
@@ -439,7 +476,7 @@ bool Data::checkIsHomeBudgetCalculationExist(const QDate &date, HomeBudgetCalcul
 
     QString queryText = "SELECT home_budget_calculation_id, period, declared_income "
                         "FROM Home_budget_calculation "
-                        "WHERE (period BETWEEN '"+date.toString("yyyy-MM-dd")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
+                        "WHERE (period BETWEEN '"+date.toString("yyyy-MM-01")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
                         "LIMIT 1";
     query.prepare(queryText);
 
@@ -496,8 +533,8 @@ bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<Fixe
         return false;
     }
 
-    queryText = "SELECT one_of_expense_id, name, amount, home_budget_id FROM One_off_expense "
-                "WHERE home_budget_id = :home_budget_id";
+    queryText = "SELECT ofe.one_of_expense_id, ofe.name, ofe.amount, ofe.home_budget_id, ofe.category_id, c.name as name_c FROM One_off_expense ofe "
+                "INNER JOIN Category c on c.category_id = ofe.category_id AND ofe.home_budget_id = :home_budget_id";
 
     query.prepare(queryText);
     query.bindValue(":home_budget_id",hbc.id);
@@ -510,7 +547,9 @@ bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<Fixe
                              query.value("one_of_expense_id").toInt(),
                              query.value("home_budget_id").toInt(),
                              query.value("amount").toDouble(),
-                             query.value("name").toString()
+                             query.value("name").toString(),
+                             query.value("category_id").toInt(),
+                             query.value("name_c").toString()
                           });
         }
     }
@@ -576,8 +615,8 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
                     "select sum(t.amount) as amount from [Transaction] t "
                     "inner join subcategory sc on t.category_id = sc.subcategory_id "
                     "left outer join category c on sc.category_id = c.category_id "
-                    "where t.multiplicand = -1 "
-                    "AND (t.[when] BETWEEN '"+date.toString("yyyy-MM-dd")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
+                    //"where t.multiplicand = -1 "
+                    "where (t.[when] BETWEEN '"+date.toString("yyyy-MM-01")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"') "
                     "AND c.category_id = " + QString::number(categoryID);
 
             qDebug() << query_text;
@@ -593,11 +632,11 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             }
             else
             {
-                qDebug() << query2.lastError();
+                error = query2.lastError().text();
             }
 
-            query_text = "select home_budget_calculation_id from home_budget_calculation hbd where hbd.period = "
-            "'"+date.toString("yyyy-MM-dd")+"'";
+            query_text = "select home_budget_calculation_id from home_budget_calculation hbd where hbd.period BETWEEN "
+            "'"+date.toString("yyyy-MM-01")+"' AND '"+date.addMonths(1).toString("yyyy-MM-dd")+"'";
 
             qDebug() << query_text;
 
@@ -614,7 +653,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             }
             else
             {
-                qDebug() << query2.lastError();
+                error = query2.lastError().text();
             }
 
             query_text = "SELECT sum(amount) as amount from Fixed_expense "
@@ -637,11 +676,12 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             }
             else
             {
-                qDebug() << query2.lastError();
+                error = query2.lastError().text();
             }
 
             query_text = "SELECT sum(amount) as amount from One_off_expense "
-                         "WHERE home_budget_id = " + QString::number(homeBudgetID);
+                         "WHERE home_budget_id = " + QString::number(homeBudgetID) + " "
+                         "AND category_id = " + QString::number(categoryID) +" ";
 
             qDebug() << query_text;
 
@@ -656,7 +696,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             }
             else
             {
-                qDebug() << query2.lastError();
+                error = query2.lastError().text();
             }
 
             resume.plannedExpense = fixedExpense + oneOffExpense;
@@ -667,7 +707,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
     }
     else
     {
-        qDebug() << query.lastError();
+        error = query.lastError().text();
     }
 
     return true;

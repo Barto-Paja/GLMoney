@@ -30,6 +30,7 @@ SOURCES += \
     income_and_expense/ribbon/core/newpayeewindow.cpp \
     income_and_expense/ribbon/core/newsubcategorywindow.cpp \
     income_and_expense/ribbon/export/exporttocsvwindow.cpp \
+    income_and_expense/ribbon/import/importcsvwindow.cpp \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.cpp \
     income_and_expense/ribbon/report/transatcionshistorywindow.cpp \
     main.cpp \
@@ -40,7 +41,6 @@ HEADERS += \
     DataStructs.h \
     income_and_expense/ribbon/core/addnewcategorywindow.hpp \
     data.hpp \
-    exporttocsvwindow.hpp \
     homebudget/homebudget_form.hpp \
     homebudget/monthresume.hpp \
     income_and_expense/incomesandexpenses_form.hpp \
@@ -51,6 +51,8 @@ HEADERS += \
     income_and_expense/ribbon/core/newsubcategorywindow.hpp \
     income_and_expense/ribbon/export.h \
     income_and_expense/ribbon/export/exporttocsvwindow.hpp \
+    income_and_expense/ribbon/import.h \
+    income_and_expense/ribbon/import/importcsvwindow.hpp \
     income_and_expense/ribbon/report.h \
     income_and_expense/ribbon/utils.h \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.hpp \
@@ -64,6 +66,7 @@ FORMS += \
     homebudget/homebudget_form.ui \
     homebudget/monthresume.ui \
     income_and_expense/incomesandexpenses_form.ui \
+    income_and_expense/ribbon/import/importcsvwindow.ui \
     mainmenu.ui \
     mainwindow.ui \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.ui \

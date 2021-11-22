@@ -10,6 +10,8 @@
 #include "ribbon/export.h"
 #include "ribbon/report.h"
 #include "ribbon/utils.h"
+#include "ribbon/import.h"
+
 
 namespace Ui {
 class IncomesAndExpenses_Form;
@@ -50,6 +52,8 @@ private slots:
 
     // Exports
     void on_toolButton_exportToCSV_clicked();
+
+    void on_toolButton_ImportTransactions_clicked();
 
 private:
     Ui::IncomesAndExpenses_Form *ui;

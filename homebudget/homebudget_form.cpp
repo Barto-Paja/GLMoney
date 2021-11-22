@@ -11,6 +11,7 @@ HomeBudget_Form::HomeBudget_Form(Data *data, QWidget *parent) :
     m_data { data }
 {
     ui->setupUi(this);
+    ui->dateEdit->setDate(QDate::currentDate());
     emit on_dateEdit_dateChanged(ui->dateEdit->date());
 
     ui->tableWidget_fixedExpenses->setColumnWidth(0,240);
@@ -20,9 +21,10 @@ HomeBudget_Form::HomeBudget_Form(Data *data, QWidget *parent) :
     ui->lineEdit_amount_oneOffExpense->setValidator(new QDoubleValidator(0,1000000.00,2,this));
     ui->lineEdit_income->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
-    for(auto i : m_data->categories())
+    for(const auto &i : m_data->categories())
     {
         ui->comboBox_category->addItem(i.name,i.id);
+        ui->comboBox_categoryOneOffExpense->addItem(i.name,i.id);
     }
 }
 
@@ -92,11 +94,13 @@ void HomeBudget_Form::on_pushButton_insert_Expense_clicked()
     src->insertRow(src->rowCount());
     src->setItem(src->rowCount()-1,0,new QTableWidgetItem(ui->lineEdit_expanseName->text()));
     src->setItem(src->rowCount()-1,1,new QTableWidgetItem(ui->lineEdit_amount_oneOffExpense->text()));
+    src->setItem(src->rowCount()-1,2,new QTableWidgetItem(ui->comboBox_categoryOneOffExpense->currentText()));
 
     m_oneoffExpanses.append(OneOffExapanseCalculation{
                                0,0,
                                QLocale::system().toDouble(ui->lineEdit_amount_oneOffExpense->text()),
-                               ui->lineEdit_expanseName->text()
+                               ui->lineEdit_expanseName->text(),
+                               ui->comboBox_categoryOneOffExpense->currentData().toInt()
                            });
 
     calulate();
@@ -116,15 +120,24 @@ void HomeBudget_Form::on_pushButton_commit_clicked()
     msg.addButton(QMessageBox::No);
     if(msg.exec() == QMessageBox::Yes)
     {
-        m_data->commitHomeBudgetCalculation(m_hbc,m_fixedExpanses,m_oneoffExpanses,m_lastError);
+       if( m_data->commitHomeBudgetCalculation(m_hbc,m_fixedExpanses,m_oneoffExpanses,m_lastError))
+       {
+           QMessageBox msg;
+           msg.setIcon(QMessageBox::Information);
+           msg.setText("Transakcja dodana pomyślnie!");
+           msg.addButton(QMessageBox::Ok);
+           msg.exec();
 
-        QMessageBox msg;
-        msg.setIcon(QMessageBox::Information);
-        msg.setText("Transakcja dodana pomyślnie!");
-        msg.addButton(QMessageBox::Ok);
-        msg.exec();
-
-        emit on_dateEdit_dateChanged(ui->dateEdit->date());
+           on_dateEdit_dateChanged(ui->dateEdit->date());
+       }
+       else
+       {
+           QMessageBox msg;
+           msg.setIcon(QMessageBox::Critical);
+           msg.setText("Nieduana transakcja!\n"+m_lastError);
+           msg.addButton(QMessageBox::Ok);
+           msg.exec();
+       }
     }
 
     return;
@@ -214,6 +227,9 @@ void HomeBudget_Form::on_dateEdit_dateChanged(const QDate &date)
 
             newItem = new QTableWidgetItem{QString::number(of.amount)};
             ofT->setItem(index,1,newItem);
+
+            newItem = new QTableWidgetItem{of.category_name};
+            ofT->setItem(index,2,newItem);
 
             index++;
         }

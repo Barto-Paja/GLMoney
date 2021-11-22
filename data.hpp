@@ -48,7 +48,15 @@ class Data : public QObject
 public:
     explicit Data(QObject *parent = nullptr);
 
+    /*!
+     * \brief Zwraca listę Centrum Kosztów
+     * \return
+     */
     QVector<Member> members() const;
+    /*!
+     * \brief Zwraca listę
+     * \return
+     */
     QVector<Payee> payees() const;
     QVector<Category> categories() const;
     QVector<SubCategory> subCategories(int index) const;
@@ -57,6 +65,7 @@ public:
     QVector<Account> accounts() const;
 
     bool addTransaction(const newTransaction &transaction, QString & error);
+    bool AddTransactions(const QVector<newTransaction> &transactions, QString & error);
     bool addPayee(const QString & name, const QString description, QString & error);
     bool addCategory(const QString & name, QString & error);
     bool addSubcategory(const QString & name, int categoryID, QString & error);
