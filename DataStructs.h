@@ -43,9 +43,22 @@ struct Payee {
     }
 };
 
+/*!
+ * \brief The Category struct
+ *
+ */
 struct Category {
-    int id;
-    QString name;
+    int ID;
+    QString Name;
+
+    Category() = default;
+    ~Category() = default;
+
+    Category(const int & id, const QString & name)
+        : ID { id }, Name { name }
+    {
+
+    }
 };
 
 struct SubCategory {
