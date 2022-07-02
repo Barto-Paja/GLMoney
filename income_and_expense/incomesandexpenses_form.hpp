@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include "data.hpp"
 
-#include "ribbon/core.h"
 #include "ribbon/export.h"
 #include "ribbon/report.h"
 #include "ribbon/utils.h"
@@ -60,12 +59,12 @@ private:
 
     Data * m_data { nullptr };
 
-    void fillComboboxes();
-    void reloadSubcategories(int index);
-    void reloadPayees();
-    void reloadCategories();
-    void reloadAccounts();
-    void reloadMembers();
+    void FillComboboxes();
+    void ReloadSubcategories(int index);
+    void ReloadPayees();
+    void ReloadCategories();
+    void ReloadAccounts();
+    void ReloadMembers();
 
 };
 

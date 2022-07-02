@@ -14,7 +14,7 @@ ImportCSVWindow::ImportCSVWindow(Data *data, QWidget *parent) :
 
     for(const auto & account : m_data->accounts())
     {
-        ui->comboBox_accounts->addItem(account.name,account.id);
+        ui->comboBox_accounts->addItem(account.Name,account.ID);
     }
 }
 
@@ -148,7 +148,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
             for(const auto & payee : payees )
             {
-                cb->addItem(payee.name ,payee.id);
+                cb->addItem(payee.Name ,payee.ID);
             }
 
             ui->tableWidget->setCellWidget(index,3,cb);
@@ -159,7 +159,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
             for(const auto & member : members )
             {
-                cb->addItem(member.name ,member.id);
+                cb->addItem(member.Name ,member.ID);
             }
 
 
@@ -173,7 +173,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
             {
                 for(const auto & subcategory : subcategories.value(i) )
                 {
-                    cb->addItem(subcategory.name,subcategory.id);
+                    cb->addItem(subcategory.Name,subcategory.ID);
                 }
             }
 

@@ -10,9 +10,9 @@ NewSubcategoryWindow::NewSubcategoryWindow(Data *data, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    for(auto i : m_data->categories())
+    for(const auto & category : m_data->categories())
     {
-        ui->comboBox->addItem(i.name,i.id);
+        ui->comboBox->addItem(category.Name,category.ID);
     }
 }
 

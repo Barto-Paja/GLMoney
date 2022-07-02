@@ -21,10 +21,10 @@ HomeBudget_Form::HomeBudget_Form(Data *data, QWidget *parent) :
     ui->lineEdit_amount_oneOffExpense->setValidator(new QDoubleValidator(0,1000000.00,2,this));
     ui->lineEdit_income->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
-    for(const auto &i : m_data->categories())
+    for(const auto & category : m_data->categories())
     {
-        ui->comboBox_category->addItem(i.name,i.id);
-        ui->comboBox_categoryOneOffExpense->addItem(i.name,i.id);
+        ui->comboBox_category->addItem(category.Name,category.ID);
+        ui->comboBox_categoryOneOffExpense->addItem(category.Name,category.ID);
     }
 }
 

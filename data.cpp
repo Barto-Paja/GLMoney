@@ -790,7 +790,6 @@ bool Data::loadMembers()
 bool Data::loadPayees()
 {
     QSqlQuery query{m_db};
-
     query.prepare("SELECT p.payee_id, p.name FROM payee p ORDER BY p.name ");
 
     if(query.exec())
@@ -798,7 +797,8 @@ bool Data::loadPayees()
         while (query.next()) {
             m_payees.append(Payee{
                 query.value("payee_id").toInt(),
-                query.value("name").toString()
+                query.value("name").toString(),
+                                0
             });
         }
 

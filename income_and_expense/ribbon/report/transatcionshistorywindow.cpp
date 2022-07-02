@@ -87,10 +87,10 @@ void TransatcionsHistoryWindow::fillCombobox()
 {
     auto v { 0 };
 
-    for(auto & i : m_data->accounts())
+    for(const auto & account : m_data->accounts())
     {
-        ui->comboBox_accounts->addItem(i.name,i.id);
-        v = i.id;
+        ui->comboBox_accounts->addItem(account.Name,account.ID);
+        v = account.ID;
     }
 
     ui->comboBox_accounts->addItem("Wszystkie",v+1);

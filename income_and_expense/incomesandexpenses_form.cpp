@@ -1,4 +1,9 @@
 #include "incomesandexpenses_form.hpp"
+#include "income_and_expense/ribbon/core/addnewcategorywindow.hpp"
+#include "income_and_expense/ribbon/core/newaccountwindow.hpp"
+#include "income_and_expense/ribbon/core/newmemberwindow.hpp"
+#include "income_and_expense/ribbon/core/newpayeewindow.hpp"
+#include "income_and_expense/ribbon/core/newsubcategorywindow.hpp"
 #include "ui_incomesandexpenses_form.h"
 
 IncomesAndExpenses_Form::IncomesAndExpenses_Form(Data *data, QWidget *parent) :
@@ -13,7 +18,7 @@ IncomesAndExpenses_Form::IncomesAndExpenses_Form(Data *data, QWidget *parent) :
     ui->dateEdit->setDate(QDate::currentDate());
     ui->lineEdit_amount->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
-    fillComboboxes();
+    FillComboboxes();
 }
 
 IncomesAndExpenses_Form::~IncomesAndExpenses_Form()
@@ -25,7 +30,7 @@ void IncomesAndExpenses_Form::on_comboBox_category_currentIndexChanged(int index
 {
     if(ui->comboBox_category->count() != 0)
     {
-        reloadSubcategories(index);
+        ReloadSubcategories(index);
     }
 }
 
@@ -151,7 +156,7 @@ void IncomesAndExpenses_Form::on_toolButton_addCategory_clicked()
 {
     AddNewCategoryWindow * dialog = new AddNewCategoryWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &AddNewCategoryWindow::destroyed, this, [&](){reloadCategories();});
+    connect(dialog, &AddNewCategoryWindow::destroyed, this, [&](){ReloadCategories();});
     dialog->show();
 }
 
@@ -159,7 +164,7 @@ void IncomesAndExpenses_Form::on_toolButton_addSubcategory_clicked()
 {
     NewSubcategoryWindow * dialog = new NewSubcategoryWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &NewSubcategoryWindow::destroyed, this, [&](){reloadCategories();});
+    connect(dialog, &NewSubcategoryWindow::destroyed, this, [&](){ReloadCategories();});
     dialog->show();
 }
 
@@ -167,7 +172,7 @@ void IncomesAndExpenses_Form::on_toolButton_addAccount_clicked()
 {
     NewAccountWindow * dialog = new NewAccountWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){reloadAccounts();});
+    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){ReloadAccounts();});
     dialog->show();
 }
 
@@ -175,7 +180,7 @@ void IncomesAndExpenses_Form::on_toolButton_addPayee_clicked()
 {
     NewPayeeWindow * dialog = new NewPayeeWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){reloadPayees();});
+    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){ReloadPayees();});
     dialog->show();
 }
 
@@ -183,7 +188,7 @@ void IncomesAndExpenses_Form::on_toolButton_addMember_clicked()
 {
     NewMemberWindow * dialog = new NewMemberWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){reloadMembers();});
+    connect(dialog, &NewPayeeWindow::destroyed, this, [&](){ReloadMembers();});
     dialog->show();
 }
 
@@ -210,96 +215,96 @@ void IncomesAndExpenses_Form::on_toolButton_exportToCSV_clicked()
 
 // -- Tab Widget
 
-void IncomesAndExpenses_Form::fillComboboxes()
+void IncomesAndExpenses_Form::FillComboboxes()
 {
-    for(auto & i : m_data->accounts())
+    for(const auto & account : m_data->accounts())
     {
-        ui->comboBox_account->addItem(i.name,i.id);
+        ui->comboBox_account->addItem(account.Name,account.ID);
     }
 
-    for(auto & i : m_data->members())
+    for(const auto & member : m_data->members())
     {
-        ui->comboBox_member->addItem(i.name,i.id);
+        ui->comboBox_member->addItem(member.Name,member.ID);
     }
 
-    for(auto & i : m_data->payees())
+    for(const auto & payee : m_data->payees())
     {
-        ui->comboBox_payee->addItem(i.name,i.id);
+        ui->comboBox_payee->addItem(payee.Name,payee.ID);
     }
 
-    for(auto & i : m_data->categories())
+    for(const auto & category : m_data->categories())
     {
-        ui->comboBox_category->addItem(i.name,i.id);
+        ui->comboBox_category->addItem(category.Name,category.ID);
     }
 }
 
-void IncomesAndExpenses_Form::reloadSubcategories(int index)
+void IncomesAndExpenses_Form::ReloadSubcategories(int index)
 {
     ui->comboBox_subcategory->clear();
 
-    if(m_data->subCategories().size() > 0)
+    if(!m_data->subCategories().isEmpty())
     {
-        for(auto & i : m_data->subCategories(index+1))
+        for(const auto & subcategory : m_data->subCategories(index+1))
         {
-            ui->comboBox_subcategory->addItem(i.name,i.id);
+            ui->comboBox_subcategory->addItem(subcategory.Name,subcategory.ID);
         }
 
         ui->comboBox_subcategory->update();
     }
 }
 
-void IncomesAndExpenses_Form::reloadPayees()
+void IncomesAndExpenses_Form::ReloadPayees()
 {
     ui->comboBox_payee->clear();
 
     m_data->reloadPayee();
 
-    for(auto & i : m_data->payees())
+    for(const auto & payee : m_data->payees())
     {
-        ui->comboBox_payee->addItem(i.name,i.id);
+        ui->comboBox_payee->addItem(payee.Name,payee.ID);
     }
 
     ui->comboBox_payee->update();
 }
 
-void IncomesAndExpenses_Form::reloadCategories()
+void IncomesAndExpenses_Form::ReloadCategories()
 {
     ui->comboBox_subcategory->clear();
     ui->comboBox_category->clear();
 
     m_data->reloadCategory();
 
-    for(auto & i : m_data->categories())
+    for(const auto & category : m_data->categories())
     {
-        ui->comboBox_category->addItem(i.name,i.id);
+        ui->comboBox_category->addItem(category.Name,category.ID);
     }
 
     ui->comboBox_category->update();
 }
 
-void IncomesAndExpenses_Form::reloadAccounts()
+void IncomesAndExpenses_Form::ReloadAccounts()
 {
     ui->comboBox_account->clear();
 
     m_data->reloadAccount();
 
-    for(auto & i : m_data->accounts())
+    for(const auto & account : m_data->accounts())
     {
-        ui->comboBox_account->addItem(i.name,i.id);
+        ui->comboBox_account->addItem(account.Name,account.ID);
     }
 
     ui->comboBox_account->update();
 }
 
-void IncomesAndExpenses_Form::reloadMembers()
+void IncomesAndExpenses_Form::ReloadMembers()
 {
     ui->comboBox_member->clear();
 
     m_data->reloadMember();
 
-    for(auto & i : m_data->members())
+    for(const auto & member : m_data->members())
     {
-        ui->comboBox_member->addItem(i.name,i.id);
+        ui->comboBox_member->addItem(member.Name,member.ID);
     }
 
     ui->comboBox_member->update();

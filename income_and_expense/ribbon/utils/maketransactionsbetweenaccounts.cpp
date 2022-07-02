@@ -10,27 +10,27 @@ MakeTransactionsBetweenAccounts::MakeTransactionsBetweenAccounts(Data *data, QWi
 
     ui->lineEdit->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
-    for(auto & i : m_data->accounts())
+    for(const auto & account : m_data->accounts())
     {
-        ui->comboBox_source->addItem(i.name,i.id);
-        ui->comboBox_target->addItem(i.name,i.id);
+        ui->comboBox_source->addItem(account.Name,account.ID);
+        ui->comboBox_target->addItem(account.Name,account.ID);
     }
 
-    for(auto & i : m_data->payees())
+    for(const auto & payee : m_data->payees())
     {
-        ui->comboBox_source_payee->addItem(i.name,i.id);
-        ui->comboBox_target_payee->addItem(i.name,i.id);
+        ui->comboBox_source_payee->addItem(payee.Name,payee.ID);
+        ui->comboBox_target_payee->addItem(payee.Name,payee.ID);
     }
 
-    for(auto & i : m_data->members())
+    for(const auto & member : m_data->members())
     {
-        ui->comboBox_member->addItem(i.name,i.id);
+        ui->comboBox_member->addItem(member.Name,member.ID);
     }
 
-    for(auto & i : m_data->categories())
+    for(const auto & category : m_data->categories())
     {
-        ui->comboBox_source_category->addItem(i.name,i.id);
-        ui->comboBox_target_category->addItem(i.name,i.id);
+        ui->comboBox_source_category->addItem(category.Name,category.ID);
+        ui->comboBox_target_category->addItem(category.Name,category.ID);
     }
 }
 
@@ -55,11 +55,11 @@ void MakeTransactionsBetweenAccounts::reloadSubcategories(SRC src, int index)
     {
         ui->comboBox_source_subcategory->clear();
 
-        if(m_data->subCategories().size() > 0)
+        if(!m_data->subCategories().isEmpty())
         {
-            for(auto i : m_data->subCategories(index+1))
+            for(const auto & subcateogry : m_data->subCategories(index+1))
             {
-                ui->comboBox_source_subcategory->addItem(i.name,i.id);
+                ui->comboBox_source_subcategory->addItem(subcateogry.Name,subcateogry.ID);
             }
 
             ui->comboBox_source_subcategory->update();
@@ -71,11 +71,11 @@ void MakeTransactionsBetweenAccounts::reloadSubcategories(SRC src, int index)
     {
         ui->comboBox_target_subcategory->clear();
 
-        if(m_data->subCategories().size() > 0)
+        if(!m_data->subCategories().isEmpty())
         {
-            for(auto i : m_data->subCategories(index+1))
+            for(const auto & subcateogry : m_data->subCategories(index+1))
             {
-                ui->comboBox_target_subcategory->addItem(i.name,i.id);
+                ui->comboBox_target_subcategory->addItem(subcateogry.Name,subcateogry.ID);
             }
 
             ui->comboBox_target_subcategory->update();
