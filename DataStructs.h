@@ -6,11 +6,21 @@
 
 /*!
  * \brief The Member struct
+ *
+ * \note To jest traktowany jako członek rodziny, do niego przypisywane są koszta.
  */
-
 struct Member {
-    int id;
-    QString name;
+    int ID;
+    QString Name;
+
+    Member() = default;
+    ~Member() = default;
+
+    Member(const int & id, const QString & name) :
+        ID{ id }, Name{ name }
+    {
+
+    }
 };
 
 struct Payee {
