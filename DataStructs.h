@@ -23,9 +23,24 @@ struct Member {
     }
 };
 
+/*!
+ * \brief The Payee struct
+ *
+ * \note To jest traktowany jako płatnik, kontrahent - do niego przypisywane są traksakcje.
+ */
 struct Payee {
-    int id;
-    QString name;
+    int ID;
+    QString Name;
+    int SuggestedSubCategoryID;
+
+    Payee() = default;
+    ~Payee() = default;
+
+    Payee(const int & id, const QString & name, const int & suggested_category_id)
+        : ID { id }, Name { name }, SuggestedSubCategoryID { suggested_category_id }
+    {
+
+    }
 };
 
 struct Category {
