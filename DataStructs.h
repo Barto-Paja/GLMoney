@@ -61,15 +61,41 @@ struct Category {
     }
 };
 
+/*!
+ * \brief The SubCategory struct
+ */
 struct SubCategory {
-    int id;
-    QString name;
-    int rootID;
+    int ID;
+    QString Name;
+    int RootID;
+
+    SubCategory() = default;
+    ~SubCategory() = default;
+
+    SubCategory(const int & id, const QString & name, const int & root_id)
+        : ID { id }, Name { name }, RootID { root_id }
+    {
+
+    }
 };
 
+/*!
+ * \brief The Account class
+ *
+ * \note W tym kontekście konto, to jest źródło, z którego ściągane są środki
+ */
 struct Account {
-    int id;
-    QString name;
+    int ID;
+    QString Name;
+
+    Account() = default;
+    ~Account() = default;
+
+    Account(const int & id, const QString & name)
+        : ID { id }, Name { name }
+    {
+
+    }
 };
 
 /*!
