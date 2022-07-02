@@ -8,6 +8,8 @@
 
 #include <QDate>
 #include <QMap>
+#include <QProgressBar>
+#include <QLabel>
 
 #include <QDebug>
 
@@ -39,6 +41,7 @@ struct newTransaction {
     int accountID{0};
     QString note;
     int multiplicand {-1};
+    QString guiNote;
 };
 
 class Data : public QObject
@@ -65,7 +68,7 @@ public:
     QVector<Account> accounts() const;
 
     bool addTransaction(const newTransaction &transaction, QString & error);
-    bool AddTransactions(const QVector<newTransaction> &transactions, QString & error);
+    bool AddTransactions(const QVector<newTransaction> &transactions, QString & error, QProgressBar * pg, QLabel * lb);
     bool addPayee(const QString & name, const QString description, QString & error);
     bool addCategory(const QString & name, QString & error);
     bool addSubcategory(const QString & name, int categoryID, QString & error);

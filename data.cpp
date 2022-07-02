@@ -42,12 +42,16 @@ QVector<Account> Data::accounts() const
     return m_accounts;
 }
 
-bool Data::AddTransactions(const QVector<newTransaction> &transactions, QString &error)
+bool Data::AddTransactions(const QVector<newTransaction> &transactions, QString &error, QProgressBar *pg, QLabel * lb)
 {
     QString msg_error = "Transakcja nr:  nie powiodła się:\n";
+    pg->setMaximum(transactions.size());
 
+    int index = 1;
     for(const auto & transaction : transactions)
     {
+        pg->setValue(index);
+        lb->setText("Dodawanie transakcji nr "+QString::number(index)+"\n" + transaction.guiNote);
         QString error_t;
         if(!addTransaction(transaction,error_t))
         {
@@ -56,6 +60,8 @@ bool Data::AddTransactions(const QVector<newTransaction> &transactions, QString 
             qDebug() << msg_error;
             return false;
         }
+        index++;
+
     }
 
     return true;

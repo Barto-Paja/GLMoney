@@ -1,6 +1,7 @@
 #include "importcsvwindow.hpp"
 #include "ui_importcsvwindow.h"
 #include <QTextCodec>
+#include <QCheckBox>
 
 ImportCSVWindow::ImportCSVWindow(Data *data, QWidget *parent) :
     QDialog(parent),
@@ -8,6 +9,8 @@ ImportCSVWindow::ImportCSVWindow(Data *data, QWidget *parent) :
     m_data { data }
 {
     ui->setupUi(this);
+    ui->progressBar->setHidden(true);
+    ui->label_message->setHidden(true);
 
     for(const auto & account : m_data->accounts())
     {
@@ -22,6 +25,9 @@ ImportCSVWindow::~ImportCSVWindow()
 
 void ImportCSVWindow::on_pushButton_importFile_clicked()
 {
+    ui->progressBar->setHidden(true);
+    ui->label_message->setHidden(true);
+
     QFileDialog dialog;
     dialog.setNameFilter(tr("Pliki danych (*.csv)"));
     m_fileName = dialog.getOpenFileName();
@@ -88,7 +94,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
     }
 
-    ui->tableWidget->setColumnCount(7);
+    ui->tableWidget->setColumnCount(8);
     QTableWidgetItem *newItem;
     newItem = new QTableWidgetItem(QString("Data Transackji"));
     ui->tableWidget->setHorizontalHeaderItem(0,newItem);
@@ -104,6 +110,8 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
     ui->tableWidget->setHorizontalHeaderItem(5,newItem);
     newItem = new QTableWidgetItem(QString("Opis"));
     ui->tableWidget->setHorizontalHeaderItem(6,newItem);
+    newItem = new QTableWidgetItem(QString("Czy importować?"));
+    ui->tableWidget->setHorizontalHeaderItem(7,newItem);
 
     ui->tableWidget->setRowCount(m_imported.size());
     ui->tableWidget->update();
@@ -118,6 +126,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
         QTableWidgetItem *newItem;
 
         QComboBox * cb;
+        QCheckBox * chb;
 
         if(m_imported[index].date.isValid())
         {
@@ -125,7 +134,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
             newItem->setFlags(newItem->flags() ^ Qt::ItemIsEditable);
             ui->tableWidget->setItem(index,0,newItem);
 
-            newItem = new QTableWidgetItem(QString("%1").arg(m_imported[index].description));
+            newItem = new QTableWidgetItem(QString("%1").arg(m_imported[index].description.trimmed()));
             newItem->setFlags(newItem->flags() ^ Qt::ItemIsEditable);
             ui->tableWidget->setItem(index,1,newItem);
 
@@ -172,6 +181,11 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
             newItem = new QTableWidgetItem(" ");
             ui->tableWidget->setItem(index,6,newItem);
+
+            chb = new QCheckBox();
+            chb->setChecked(true);
+            ui->tableWidget->setCellWidget(index,7,chb);
+
             counter++;
 
 
@@ -180,16 +194,29 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
     ui->tableWidget->setRowCount(counter);
     ui->tableWidget->resizeColumnsToContents();
+    ui->tableWidget->setShowGrid(false);
     ui->tableWidget->update();
 
 }
 
 void ImportCSVWindow::on_pushButton_commit_clicked()
 {
-    QVector<newTransaction> transactions;
+    ui->progressBar->setHidden(false);
+    ui->label_message->setHidden(false);
 
+    ui->progressBar->setMaximum(ui->tableWidget->rowCount());
+
+    QVector<newTransaction> transactions;
+    int index = 1;
     for(int i = 0; i < ui->tableWidget->rowCount(); ++i)
     {
+        QCheckBox * chb = qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,7));
+        if(!chb->isChecked())
+        {
+            index++;
+            continue;
+        }
+
         newTransaction t;
         QTableWidgetItem* theItem = ui->tableWidget->item(i,0);
         t.date = theItem->data(0).toDate();
@@ -220,16 +247,20 @@ void ImportCSVWindow::on_pushButton_commit_clicked()
 
         t.accountID = ui->comboBox_accounts->currentData().toInt();
 
+        theItem = ui->tableWidget->item(i,1);
+        t.guiNote = theItem->data(0).toString();
+
+        index++;
         transactions.append(t);
 
 
     }
     QString error;
-    if(m_data->AddTransactions(transactions,error))
+    if(m_data->AddTransactions(transactions,error,ui->progressBar,ui->label_message))
     {
         QMessageBox msg;
         msg.setIcon(QMessageBox::Information);
-        msg.setText("Proces dodawania transakcji przebiegł pomyślnie!");
+        msg.setText("Proces dodawania transakcji przebiegł pomyślnie! ");
         msg.addButton(QMessageBox::Ok);
         msg.exec();
 
