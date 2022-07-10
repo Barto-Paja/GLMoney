@@ -42,7 +42,7 @@ bool TransatcionsHistoryWindow::fillTable()
     {
         if(currentAccountSelected != maxAccountId)
         {
-            if(currentAccountSelected != i.accountID)
+            if(currentAccountSelected != i.AccountID)
             {
                 continue;
             }
@@ -51,28 +51,28 @@ bool TransatcionsHistoryWindow::fillTable()
         QTableWidgetItem *newItem;
 
         // ID
-        newItem = new QTableWidgetItem(QString("%1").arg(i.id));
+        newItem = new QTableWidgetItem(QString("%1").arg(i.ID));
         ui->tableWidget->setItem(index,0,newItem);
         // Data
-        newItem = new QTableWidgetItem(i.date.toString("yyyy-MM-dd"));
+        newItem = new QTableWidgetItem(i.Date.toString("yyyy-MM-dd"));
         ui->tableWidget->setItem(index,1,newItem);
         // Konto
-        newItem = new QTableWidgetItem(i.account);
+        newItem = new QTableWidgetItem(i.Account);
         ui->tableWidget->setItem(index,2,newItem);
         // Płatnik
-        newItem = new QTableWidgetItem(i.payee);
+        newItem = new QTableWidgetItem(i.Payee);
         ui->tableWidget->setItem(index,3,newItem);
         // Kwota
-        newItem = new QTableWidgetItem(QString("%1").arg(i.amount));
+        newItem = new QTableWidgetItem(QString("%1").arg(i.Amount));
         ui->tableWidget->setItem(index,4,newItem);
         // Centrum kosztów
-        newItem = new QTableWidgetItem(i.member);
+        newItem = new QTableWidgetItem(i.Member);
         ui->tableWidget->setItem(index,5,newItem);
         // Kategoria
-        newItem = new QTableWidgetItem(i.category + " - " + i.subcategory );
+        newItem = new QTableWidgetItem(i.Category + " - " + i.Subcategory );
         ui->tableWidget->setItem(index,6,newItem);
         // Notatka
-        newItem = new QTableWidgetItem(i.note);
+        newItem = new QTableWidgetItem(i.Note);
         ui->tableWidget->setItem(index,7,newItem);
 
         index++;

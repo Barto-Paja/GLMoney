@@ -104,19 +104,19 @@ void MakeTransactionsBetweenAccounts::on_pushButton_Commit_clicked()
     QString error;
     TransferBetweenAccounts t;
 
-    t.sourceID = ui->comboBox_source->currentData().toInt();
-    t.sourcePayeeMirror = ui->comboBox_target_payee->currentData().toInt();
-    t.sourceSubcategory = ui->comboBox_source_subcategory->currentData().toInt();
+    t.SourceID = ui->comboBox_source->currentData().toInt();
+    t.SourcePayeeMirror = ui->comboBox_target_payee->currentData().toInt();
+    t.SourceSubcategory = ui->comboBox_source_subcategory->currentData().toInt();
 
-    t.targetID = ui->comboBox_target->currentData().toInt();
-    t.targetPayeeMirror = ui->comboBox_source_payee->currentData().toInt();
-    t.targetSubcategory = ui->comboBox_target_subcategory->currentData().toInt();
+    t.TargetID = ui->comboBox_target->currentData().toInt();
+    t.TargetPayeeMirror = ui->comboBox_source_payee->currentData().toInt();
+    t.TargetSubcategory = ui->comboBox_target_subcategory->currentData().toInt();
 
-    t.date = ui->calendarWidget->selectedDate();
-    t.amount = QLocale::system().toDouble(ui->lineEdit->text());
-    t.memberID = ui->comboBox_member->currentData().toInt();
+    t.Date = ui->calendarWidget->selectedDate();
+    t.Amount = QLocale::system().toDouble(ui->lineEdit->text());
+    t.MemberID = ui->comboBox_member->currentData().toInt();
 
-    if(t.sourceID == t.targetID)
+    if(t.SourceID == t.TargetID)
     {
         QMessageBox msg;
         msg.setIcon(QMessageBox::Critical);

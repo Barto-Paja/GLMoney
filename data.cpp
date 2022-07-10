@@ -227,7 +227,7 @@ bool Data::addAccount(const QString &name, const QString &description, QString &
     }
 }
 
-bool Data::getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> &transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString & error)
+bool Data::GetTransactionsResume(int start_year, int end_year, QVector<TransactionsResume> &transactions_history_expanse, QVector<TransactionsResume> &transactions_history_income, QString & error)
 {
     QSqlQuery query {m_db};
     QString query_text {
@@ -247,7 +247,7 @@ bool Data::getTransactionsResume(int start_year, int end_year, QVector<transacti
     {
         while(query.next())
         {
-            transactions_history_expanse.append(transactionsResume{
+            transactions_history_expanse.append(TransactionsResume{
                 balance::expanse,
                 query.value("Balance").toDouble(),
                 query.value("year").toInt(),
@@ -278,7 +278,7 @@ bool Data::getTransactionsResume(int start_year, int end_year, QVector<transacti
     {
         while(query.next())
         {
-            transactions_history_income.append(transactionsResume{
+            transactions_history_income.append(TransactionsResume{
                 balance::income,
                 query.value("Balance").toDouble(),
                 query.value("year").toInt(),
@@ -401,13 +401,13 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
     m_db.transaction();
 
     QString queryText;
-    if(!home_calc.isValid)
+    if(!home_calc.IsValid)
     {
         queryText =
             "INSERT INTO Home_budget_calculation ( period, declared_income ) "
             " VALUES ( '" +
-            home_calc.date.toString("yyyy-MM-dd") + "', "
-            + QString::number(home_calc.declaredIncome) + ") "
+                home_calc.Date.toString("yyyy-MM-dd") + "', "
+                + QString::number(home_calc.DeclaredIncome) + ") "
         ;
 
         query.prepare(queryText);
@@ -418,7 +418,7 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
             return false;
         }
 
-        checkIsHomeBudgetCalculationExist(home_calc.date,home_calc,error);
+        checkIsHomeBudgetCalculationExist(home_calc.Date,home_calc,error);
 
     }
 
@@ -430,10 +430,10 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
                         "( :category_id, :amount, :home_budget_calculation, :category_id )";
 
             query.prepare(queryText);
-            query.bindValue(":category_id",i.categoryID);
-            query.bindValue(":amount",i.amount);
-            query.bindValue(":home_budget_calculation",home_calc.id);
-            query.bindValue(":category_id",i.categoryID);
+            query.bindValue(":category_id",i.CategoryID);
+            query.bindValue(":amount",i.Amount);
+            query.bindValue(":home_budget_calculation",home_calc.ID);
+            query.bindValue(":category_id",i.CategoryID);
 
             if(query.exec())
             {
@@ -455,10 +455,10 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
                     "( :name, :amount, :home_budget_id )";
 
         query.prepare(queryText);
-        query.bindValue(":name",i.name);
-        query.bindValue(":amount",i.amount);
-        query.bindValue(":home_budget_id",home_calc.id);
-        query.bindValue(":category_id",i.categoryID);
+        query.bindValue(":name",i.Name);
+        query.bindValue(":amount",i.Amount);
+        query.bindValue(":home_budget_id",home_calc.ID);
+        query.bindValue(":category_id",i.CategoryID);
 
         if(query.exec())
         {
@@ -490,10 +490,10 @@ bool Data::checkIsHomeBudgetCalculationExist(const QDate &date, HomeBudgetCalcul
     {
         if(query.next())
         {
-            home_calc.id = query.value("home_budget_calculation_id").toInt();
-            home_calc.date = query.value("period").toDate();
-            home_calc.declaredIncome = query.value("declared_income").toDouble();
-            home_calc.isValid = true;
+            home_calc.ID = query.value("home_budget_calculation_id").toInt();
+            home_calc.Date = query.value("period").toDate();
+            home_calc.DeclaredIncome = query.value("declared_income").toDouble();
+            home_calc.IsValid = true;
             return true;
         }
         else
@@ -518,7 +518,7 @@ bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<Fixe
                         "inner join category c on c.category_id = fe.category_id "
                         "WHERE home_budget_calculation = :home_budget_calculation" };
     query.prepare(queryText);
-    query.bindValue(":home_budget_calculation",hbc.id);
+    query.bindValue(":home_budget_calculation",hbc.ID);
 
     if(query.exec())
     {
@@ -543,7 +543,7 @@ bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<Fixe
                 "INNER JOIN Category c on c.category_id = ofe.category_id AND ofe.home_budget_id = :home_budget_id";
 
     query.prepare(queryText);
-    query.bindValue(":home_budget_id",hbc.id);
+    query.bindValue(":home_budget_id",hbc.ID);
 
     if(query.exec())
     {
@@ -571,12 +571,12 @@ bool Data::loadHomeBudgetExpanses(const HomeBudgetCalculation & hbc,QVector<Fixe
 bool Data::makeTransactionBetweenAccounts(const TransferBetweenAccounts & transferData, QString &error)
 {
     if(!addTransaction(newTransaction{
-                       transferData.date,
-                       transferData.sourcePayeeMirror,
-                       transferData.amount,
-                       transferData.targetSubcategory,
-                       transferData.memberID,
-                       transferData.sourceID,
+                       transferData.Date,
+                       transferData.SourcePayeeMirror,
+                       transferData.Amount,
+                       transferData.TargetSubcategory,
+                       transferData.MemberID,
+                       transferData.SourceID,
                        "Transfer środków pomiędzy kontami",
                        -1
                    }, error))
@@ -585,12 +585,12 @@ bool Data::makeTransactionBetweenAccounts(const TransferBetweenAccounts & transf
     }
 
     return addTransaction(newTransaction{
-                              transferData.date,
-                              transferData.targetPayeeMirror,
-                              transferData.amount,
-                              transferData.sourceSubcategory,
-                              transferData.memberID,
-                              transferData.targetID,
+                              transferData.Date,
+                              transferData.TargetPayeeMirror,
+                              transferData.Amount,
+                              transferData.SourceSubcategory,
+                              transferData.MemberID,
+                              transferData.TargetID,
                               "Transfer środków pomiędzy kontami",
                               1
                           }, error);
@@ -614,7 +614,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             CategoryResume resume;
             int categoryID { 0 };
 
-            resume.categoryName = query.value("name").toString();
+            resume.CategoryName = query.value("name").toString();
             categoryID = query.value("category_id").toInt();
 
             query_text =
@@ -633,7 +633,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
             {
                 if(query2.next())
                 {
-                    resume.calculatedExpense = query2.value("amount").toDouble();
+                    resume.CalculatedExpense = query2.value("amount").toDouble();
                 }
             }
             else
@@ -705,7 +705,7 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
                 error = query2.lastError().text();
             }
 
-            resume.plannedExpense = fixedExpense + oneOffExpense;
+            resume.PlannedExpense = fixedExpense + oneOffExpense;
 
             resumes.push_back(resume);
 

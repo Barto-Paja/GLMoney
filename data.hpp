@@ -75,7 +75,7 @@ public:
     bool addMember(const QString & name, QString & error);
     bool addAccount(const QString & name, const QString & description, QString & error);
 
-    bool getTransactionsResume(int start_year, int end_year, QVector<transactionsResume> & transactions_history_expanse, QVector<transactionsResume> &transactions_history_income, QString &error);
+    bool GetTransactionsResume(int start_year, int end_year, QVector<TransactionsResume> & transactions_history_expanse, QVector<TransactionsResume> &transactions_history_income, QString &error);
     bool getTransactionsHistory(QDate start, QDate end, QVector<TransactionHistory> &transactions_history, QString & error);
 
     void reloadPayee();

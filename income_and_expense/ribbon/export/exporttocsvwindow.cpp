@@ -70,7 +70,7 @@ bool ExportToCSVWindow::exportToCSV()
 
                 if(!ui->checkBox_expenses->isChecked())
                 {
-                    if(i.amount < 0.00)
+                    if(i.Amount < 0.00)
                     {
                         index++;
                         continue;
@@ -78,16 +78,16 @@ bool ExportToCSVWindow::exportToCSV()
                 }
                 if(!ui->checkBox_income->isChecked())
                 {
-                    if(i.amount >= 0.00)
+                    if(i.Amount >= 0.00)
                     {
                         index++;
                         continue;
                     }
                 }
 
-                stream << i.account << ";" << i.payee << ";" << i.member << ";"
-                << i.date.toString("yyyy-MM-dd") << ";" << locale.toString(i.amount,'f',2) << ";"
-                << i.category << ";" << i.subcategory << ";" << "\n";
+                stream << i.Account << ";" << i.Payee << ";" << i.Member << ";"
+                << i.Date.toString("yyyy-MM-dd") << ";" << locale.toString(i.Amount,'f',2) << ";"
+                << i.Category << ";" << i.Subcategory << ";" << "\n";
                 index++;
             }
         }

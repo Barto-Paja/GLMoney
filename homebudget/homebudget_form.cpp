@@ -145,17 +145,17 @@ void HomeBudget_Form::on_pushButton_commit_clicked()
 
 void HomeBudget_Form::calulate()
 {
-    m_hbc.date = ui->dateEdit->date();
-    m_hbc.declaredIncome = QLocale::system().toDouble(ui->lineEdit_income->text());
+    m_hbc.Date = ui->dateEdit->date();
+    m_hbc.DeclaredIncome = QLocale::system().toDouble(ui->lineEdit_income->text());
 
     auto expanses { 0.00 };
     for(auto i : m_fixedExpanses )
     {
-        expanses += i.amount;
+        expanses += i.Amount;
     }
     for(auto i : m_oneoffExpanses)
     {
-        expanses += i.amount;
+        expanses += i.Amount;
     }
 
     auto result = QLocale::system().toDouble(ui->lineEdit_income->text()) - expanses;
@@ -186,14 +186,14 @@ void HomeBudget_Form::on_dateEdit_dateChanged(const QDate &date)
 
     }
 
-    ui->lineEdit_income->setText(QString::number(m_hbc.declaredIncome));
+    ui->lineEdit_income->setText(QString::number(m_hbc.DeclaredIncome));
 
     ui->tableWidget_fixedExpenses->setRowCount(0);
     ui->tableWidget_oneOffExpenses->setRowCount(0);
     m_fixedExpanses.clear();
     m_oneoffExpanses.clear();
 
-    if(m_hbc.isValid)
+    if(m_hbc.IsValid)
     {
         m_data->loadHomeBudgetExpanses(m_hbc,m_fixedExpanses,m_oneoffExpanses,m_lastError);
 
@@ -208,10 +208,10 @@ void HomeBudget_Form::on_dateEdit_dateChanged(const QDate &date)
         {
             QTableWidgetItem *newItem;
 
-            newItem = new QTableWidgetItem{fe.category};
+            newItem = new QTableWidgetItem{fe.Category};
             feT->setItem(index,0,newItem);
 
-            newItem = new QTableWidgetItem{QString::number(fe.amount)};
+            newItem = new QTableWidgetItem{QString::number(fe.Amount)};
             feT->setItem(index,1,newItem);
 
             index++;
@@ -222,13 +222,13 @@ void HomeBudget_Form::on_dateEdit_dateChanged(const QDate &date)
         {
             QTableWidgetItem *newItem;
 
-            newItem = new QTableWidgetItem{of.name};
+            newItem = new QTableWidgetItem{of.Name};
             ofT->setItem(index,0,newItem);
 
-            newItem = new QTableWidgetItem{QString::number(of.amount)};
+            newItem = new QTableWidgetItem{QString::number(of.Amount)};
             ofT->setItem(index,1,newItem);
 
-            newItem = new QTableWidgetItem{of.category_name};
+            newItem = new QTableWidgetItem{of.CategoryName};
             ofT->setItem(index,2,newItem);
 
             index++;
