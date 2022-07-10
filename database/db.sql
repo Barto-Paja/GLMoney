@@ -5,6 +5,7 @@ CREATE TABLE Account (
   account_id INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT UNIQUE NOT NULL,
   name VARCHAR NOT NULL, description TEXT
 );
+
 /*
  Table Category
 */
@@ -23,9 +24,7 @@ VALUES
   ('Nieskategoryzowane', 6),
   ('Osobiste', 7),
   ('Rozrywka', 8),
-  (
-    'Oszczędności i inwestycje', 9
-  ),
+  ('Oszczędności i inwestycje', 9),
   ('Wpływy', 10);
 
 /*
@@ -34,16 +33,6 @@ VALUES
 CREATE TABLE Member (
   member_id INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT UNIQUE NOT NULL,
   name TEXT NOT NULL
-);
-
-/*
- Table Payee
-*/
-
-CREATE TABLE Payee (
-  payee_id INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT UNIQUE NOT NULL,
-  name TEXT NOT NULL UNIQUE ON CONFLICT ROLLBACK,
-  description TEXT
 );
 
 /*
@@ -135,7 +124,23 @@ VALUES
   (10, 'Wynagrodzenie', 52),
   (10, 'Wpływy - inne', 53),
   (3, 'Telewizja i telefon', 54),
-  (3, 'Raty i zadłużenia', 55);
+  (3, 'Raty i zadłużenia', 55),
+  (6, 'BRAK', 0);
+
+/*
+ Table Payee
+*/
+CREATE TABLE Payee (
+    payee_id       INTEGER PRIMARY KEY ON CONFLICT ROLLBACK AUTOINCREMENT
+                           UNIQUE
+                           NOT NULL,
+    name           TEXT    NOT NULL
+                           UNIQUE ON CONFLICT ROLLBACK,
+    description    TEXT,
+    subcategory_id INTEGER REFERENCES Subcategory (subcategory_id)
+                           NOT NULL
+                           DEFAULT (0)
+);
 
 /*
  Table Transaction
