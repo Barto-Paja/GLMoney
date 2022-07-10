@@ -107,136 +107,152 @@ enum class balance{
     income
 };
 
-struct transactionsResume
+struct TransactionsResume
 {
-    balance type { balance::expanse };
-    double amount {0.0};
-    int year;
-    int month;
+    balance Type { balance::expanse };
+    double Amount {0.0};
+    int Year;
+    int Month;
 
-    transactionsResume(balance type_v, double amount_v, int y, int m)
-        : type(type_v), amount(amount_v), year(y), month(m)
+    TransactionsResume() = default;
+    ~TransactionsResume() = default;
+
+    TransactionsResume(balance type, double amount, int year, int month)
+        : Type{type}, Amount{amount}, Year{year}, Month{month}
     {}
 };
 
 struct TransactionHistory
 {
-    int id {0};
-    double amount {0.00};
-    QDate date;
-    QString payee;
-    QString category;
-    QString subcategory;
-    QString member;
-    QString note;
-    QString account;
-    int accountID;
+    int ID {0};
+    double Amount {0.00};
+    QDate Date;
+    QString Payee;
+    QString Category;
+    QString Subcategory;
+    QString Member;
+    QString Note;
+    QString Account;
+    int AccountID;
 
-    TransactionHistory(int id_v, double amount_v, QDate date_v, QString payee_v,
-                       QString category_v, QString subcategory_v, QString member_v, QString note_v, QString account_v, int account_id)
-        : id            { id_v },
-          amount        { amount_v },
-          date          { date_v },
-          payee         { payee_v },
-          category      { category_v },
-          subcategory   { subcategory_v },
-          member        { member_v },
-          note          { note_v},
-          account       { account_v},
-          accountID     { account_id}
+    TransactionHistory() = default;
+    ~TransactionHistory() = default;
+
+    TransactionHistory(int id, double amount, QDate date, QString payee,
+                       QString category, QString subcategory, QString member, QString note, QString account, int account_id)
+        : ID            { id },
+          Amount        { amount },
+          Date          { date },
+          Payee         { payee },
+          Category      { category },
+          Subcategory   { subcategory },
+          Member        { member },
+          Note          { note },
+          Account       { account },
+          AccountID     { account_id }
     {}
 };
 
 struct HomeBudgetCalculation
 {
-    int id { 0 };
-    double declaredIncome {0.00};
-    QDate date;
-    bool isValid { false };
+    int ID { 0 };
+    double DeclaredIncome {0.00};
+    QDate Date;
+    bool IsValid { false };
 
-    HomeBudgetCalculation(){}
-    HomeBudgetCalculation(int id_v, double income_v, const QDate & date_v) :
-        id { id_v },
-        declaredIncome { income_v },
-        date { date_v }
+    HomeBudgetCalculation() = default;
+    ~HomeBudgetCalculation() = default;
+
+    HomeBudgetCalculation(int id, double income, const QDate & date) :
+        ID { id },
+        DeclaredIncome { income },
+        Date { date }
     {}
 };
 
 struct FixedExpanseCalculation
 {
-    int id { 0 };
-    int homeBudgetCalculationID { 0 };
-    int categoryID { 0 };
-    double amount {0.00};
-    QString category;
+    int ID { 0 };
+    int HomeBudgetCalculationID { 0 };
+    int CategoryID { 0 };
+    double Amount {0.00};
+    QString Category;
 
-    FixedExpanseCalculation(int id_v, int homebudgetcacl_id_v, int categoryID_v,
-                            double amount_v, const QString & categoryName) :
-        id { id_v },
-        homeBudgetCalculationID { homebudgetcacl_id_v },
-        categoryID { categoryID_v },
-        amount { amount_v },
-        category { categoryName }
+    FixedExpanseCalculation() = default;
+    ~FixedExpanseCalculation() = default;
+
+    FixedExpanseCalculation(int id, int homebudgetcacl_id, int category_id,
+                            double amount, const QString & category_name) :
+        ID { id },
+        HomeBudgetCalculationID { homebudgetcacl_id },
+        CategoryID { category_id },
+        Amount { amount },
+        Category { category_name }
     {}
 
 };
 
 struct OneOffExapanseCalculation
 {
-    int id { 0 };
-    int homeBudgetCalculationID { 0 };
-    double amount {0.00};
-    QString name;
-    int categoryID {0};
-    QString category_name;
+    int ID { 0 };
+    int HomeBudgetCalculationID { 0 };
+    double Amount {0.00};
+    QString Name;
+    int CategoryID {0};
+    QString CategoryName;
 
-    OneOffExapanseCalculation(int id_v, int homebudgetcacl_id_v, double amount_v,
-                              const QString & name_v, const int & category) :
-        id { id_v },
-        homeBudgetCalculationID { homebudgetcacl_id_v },
-        amount { amount_v },
-        name { name_v },
-        categoryID { category }
+    OneOffExapanseCalculation() = default;
+    ~OneOffExapanseCalculation() = default;
+
+    OneOffExapanseCalculation(int id, int home_budget_cacl_id, double amount,
+                              const QString & name, const int & category) :
+        ID { id },
+        HomeBudgetCalculationID { home_budget_cacl_id },
+        Amount { amount },
+        Name { name },
+        CategoryID { category }
     {}
 
-    OneOffExapanseCalculation(int id_v, int homebudgetcacl_id_v, double amount_v,
-                              const QString & name_v, const int & category, const QString & name_cat) :
-        id { id_v },
-        homeBudgetCalculationID { homebudgetcacl_id_v },
-        amount { amount_v },
-        name { name_v },
-        categoryID { category },
-        category_name { name_cat }
+    OneOffExapanseCalculation(int id, int home_budget_cacl_id, double amount,
+                              const QString & name, const int & category, const QString & name_cat) :
+        ID { id },
+        HomeBudgetCalculationID { home_budget_cacl_id },
+        Amount { amount },
+        Name { name },
+        CategoryID { category },
+        CategoryName { name_cat }
     {}
 };
 
 
 struct TransferBetweenAccounts
 {
-    long sourceID;
-    long sourcePayeeMirror;
-    long sourceSubcategory;
+    long SourceID;
+    long SourcePayeeMirror;
+    long SourceSubcategory;
 
-    long targetID;
-    long targetPayeeMirror;
-    long targetSubcategory;
+    long TargetID;
+    long TargetPayeeMirror;
+    long TargetSubcategory;
 
-    long memberID;
+    long MemberID;
 
-    double amount;
+    double Amount;
 
-    QDate date;
+    QDate Date;
 
-    TransferBetweenAccounts(){}
+    TransferBetweenAccounts() = default;
+    ~TransferBetweenAccounts() = default;
 };
 
 struct CategoryResume
 {
-    QString categoryName;
-    double plannedExpense;
-    double calculatedExpense;
+    QString CategoryName;
+    double PlannedExpense;
+    double CalculatedExpense;
 
-    CategoryResume(){}
+    CategoryResume() = default;
+    ~CategoryResume() = default;
 };
 
 #endif // DATASTRUCTS_H
