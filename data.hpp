@@ -90,6 +90,12 @@ public:
     bool makeTransactionBetweenAccounts(const TransferBetweenAccounts & transferData, QString &error);
     bool getResume(const QDate & date, QVector<CategoryResume> & resumes, QString & error);
 
+    Payee GetPayee(const int & id) const;
+    SubCategory GetSubCategory(const int & id) const;
+
+    bool UpdatePayee(const Payee & payee);
+
+
 signals:
 
 private:

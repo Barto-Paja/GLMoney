@@ -4,6 +4,7 @@
 #include "income_and_expense/ribbon/core/newmemberwindow.hpp"
 #include "income_and_expense/ribbon/core/newpayeewindow.hpp"
 #include "income_and_expense/ribbon/core/newsubcategorywindow.hpp"
+#include "income_and_expense/ribbon/core/payeeinformationwindow.hpp"
 #include "ui_incomesandexpenses_form.h"
 
 IncomesAndExpenses_Form::IncomesAndExpenses_Form(Data *data, QWidget *parent) :
@@ -319,6 +320,9 @@ void IncomesAndExpenses_Form::on_toolButton_ImportTransactions_clicked()
 
 void IncomesAndExpenses_Form::on_pushButton_editPayee_clicked()
 {
-
+    auto i = ui->comboBox_payee->currentData().toInt();
+    PayeeInformationWindow * dialog = new PayeeInformationWindow(i,m_data,this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
