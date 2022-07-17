@@ -790,15 +790,17 @@ bool Data::loadMembers()
 bool Data::loadPayees()
 {
     QSqlQuery query{m_db};
-    query.prepare("SELECT p.payee_id, p.name FROM payee p ORDER BY p.name ");
+    query.prepare("SELECT p.payee_id, p.name as payee_name, p.description, p.subcategory_id, s.name as subcategory_name FROM Payee p "
+                  "INNER JOIN Subcategory s ON p.subcategory_id = s.subcategory_id; ");
 
     if(query.exec())
     {
         while (query.next()) {
             m_payees.append(Payee{
                 query.value("payee_id").toInt(),
-                query.value("name").toString(),
-                                0
+                query.value("payee_name").toString(),
+                query.value("subcategory_id").toInt(),
+                query.value("subcategory_name").toString()
             });
         }
 

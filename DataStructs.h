@@ -32,12 +32,13 @@ struct Payee {
     int ID;
     QString Name;
     int SuggestedSubCategoryID;
+    QString SubcategoryName;
 
     Payee() = default;
     ~Payee() = default;
 
-    Payee(const int & id, const QString & name, const int & suggested_category_id)
-        : ID { id }, Name { name }, SuggestedSubCategoryID { suggested_category_id }
+    Payee(const int & id, const QString & name, const int & suggested_category_id, const QString & subcategory_name)
+        : ID { id }, Name { name }, SuggestedSubCategoryID { suggested_category_id }, SubcategoryName{ subcategory_name }
     {
 
     }

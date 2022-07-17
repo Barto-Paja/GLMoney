@@ -54,6 +54,8 @@ private slots:
 
     void on_toolButton_ImportTransactions_clicked();
 
+    void on_pushButton_editPayee_clicked();
+
 private:
     Ui::IncomesAndExpenses_Form *ui;
 

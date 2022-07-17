@@ -316,3 +316,9 @@ void IncomesAndExpenses_Form::on_toolButton_ImportTransactions_clicked()
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
+
+void IncomesAndExpenses_Form::on_pushButton_editPayee_clicked()
+{
+
+}
+

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1200</width>
-    <height>654</height>
+    <height>702</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,6 @@
      <property name="font">
       <font>
        <pointsize>14</pointsize>
-       <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
@@ -49,7 +48,7 @@ QTabBar::tab {
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="iconSize">
       <size>
@@ -85,7 +84,6 @@ QTabBar::tab {
          <property name="font">
           <font>
            <pointsize>14</pointsize>
-           <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
@@ -93,7 +91,7 @@ QTabBar::tab {
           <string>Dodaj kategorię</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/add-folder.png</normaloff>:/images/add-folder.png</iconset>
          </property>
          <property name="iconSize">
@@ -112,7 +110,6 @@ QTabBar::tab {
          <property name="font">
           <font>
            <pointsize>14</pointsize>
-           <weight>50</weight>
            <bold>false</bold>
           </font>
          </property>
@@ -120,7 +117,7 @@ QTabBar::tab {
           <string>Dodaj podkategorię</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/add-folder.png</normaloff>:/images/add-folder.png</iconset>
          </property>
          <property name="iconSize">
@@ -184,7 +181,7 @@ QTabBar::tab {
 konto</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/dollar-symbol.png</normaloff>:/images/dollar-symbol.png</iconset>
          </property>
          <property name="iconSize">
@@ -210,7 +207,7 @@ konto</string>
 Płatnika</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/man.png</normaloff>:/images/man.png</iconset>
          </property>
          <property name="iconSize">
@@ -236,7 +233,7 @@ Płatnika</string>
 Kosztów</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/man_1.png</normaloff>:/images/man_1.png</iconset>
          </property>
          <property name="iconSize">
@@ -307,7 +304,7 @@ Kosztów</string>
 między Kontami</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/transfer-arrows.png</normaloff>:/images/transfer-arrows.png</iconset>
          </property>
          <property name="iconSize">
@@ -370,7 +367,7 @@ między Kontami</string>
           <string>Raport Miesięczny</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/data-spreadsheet.png</normaloff>:/images/data-spreadsheet.png</iconset>
          </property>
          <property name="iconSize">
@@ -423,7 +420,7 @@ między Kontami</string>
           <string>Zapis do CSV</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/diskette.png</normaloff>:/images/diskette.png</iconset>
          </property>
          <property name="iconSize">
@@ -469,7 +466,7 @@ między Kontami</string>
 transakcje z csv</string>
          </property>
          <property name="icon">
-          <iconset resource="../images.qrc">
+          <iconset>
            <normaloff>:/images/import.png</normaloff>:/images/import.png</iconset>
          </property>
          <property name="iconSize">
@@ -668,13 +665,12 @@ transakcje z csv</string>
             <property name="font">
              <font>
               <pointsize>12</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2">
+          <item row="2" column="0">
            <widget class="QCheckBox" name="checkBox_isIncome">
             <property name="font">
              <font>
@@ -683,6 +679,13 @@ transakcje z csv</string>
             </property>
             <property name="text">
              <string>Wpływ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="pushButton_editPayee">
+            <property name="text">
+             <string>Informacje o kontrachencie</string>
             </property>
            </widget>
           </item>
@@ -853,8 +856,6 @@ transakcje z csv</string>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
