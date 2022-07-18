@@ -88,6 +88,10 @@ void PayeeInformationWindow::on_pushButton_save_clicked()
         msg.setText("Transakcja dodana pomyślnie!");
         msg.addButton(QMessageBox::Ok);
         msg.exec();
+
+        m_data->reloadPayee();
+
+        close();
     }
 }
 

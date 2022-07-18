@@ -91,7 +91,7 @@ QTabBar::tab {
           <string>Dodaj kategorię</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/add-folder.png</normaloff>:/images/add-folder.png</iconset>
          </property>
          <property name="iconSize">
@@ -117,7 +117,7 @@ QTabBar::tab {
           <string>Dodaj podkategorię</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/add-folder.png</normaloff>:/images/add-folder.png</iconset>
          </property>
          <property name="iconSize">
@@ -181,7 +181,7 @@ QTabBar::tab {
 konto</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/dollar-symbol.png</normaloff>:/images/dollar-symbol.png</iconset>
          </property>
          <property name="iconSize">
@@ -207,7 +207,7 @@ konto</string>
 Płatnika</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/man.png</normaloff>:/images/man.png</iconset>
          </property>
          <property name="iconSize">
@@ -233,7 +233,7 @@ Płatnika</string>
 Kosztów</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/man_1.png</normaloff>:/images/man_1.png</iconset>
          </property>
          <property name="iconSize">
@@ -304,7 +304,7 @@ Kosztów</string>
 między Kontami</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/transfer-arrows.png</normaloff>:/images/transfer-arrows.png</iconset>
          </property>
          <property name="iconSize">
@@ -367,7 +367,7 @@ między Kontami</string>
           <string>Raport Miesięczny</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/data-spreadsheet.png</normaloff>:/images/data-spreadsheet.png</iconset>
          </property>
          <property name="iconSize">
@@ -420,7 +420,7 @@ między Kontami</string>
           <string>Zapis do CSV</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/diskette.png</normaloff>:/images/diskette.png</iconset>
          </property>
          <property name="iconSize">
@@ -466,7 +466,7 @@ między Kontami</string>
 transakcje z csv</string>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../images.qrc">
            <normaloff>:/images/import.png</normaloff>:/images/import.png</iconset>
          </property>
          <property name="iconSize">
@@ -685,7 +685,7 @@ transakcje z csv</string>
           <item row="2" column="1">
            <widget class="QPushButton" name="pushButton_editPayee">
             <property name="text">
-             <string>Informacje o kontrachencie</string>
+             <string>Informacje o kontrahencie</string>
             </property>
            </widget>
           </item>
@@ -856,6 +856,8 @@ transakcje z csv</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../images.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -326,3 +326,20 @@ void IncomesAndExpenses_Form::on_pushButton_editPayee_clicked()
     dialog->show();
 }
 
+
+void IncomesAndExpenses_Form::on_comboBox_payee_currentIndexChanged(int index)
+{
+    auto payee { m_data->GetPayee(ui->comboBox_payee->currentData().toInt())};
+    auto subcategory { m_data->GetSubCategory(payee.SuggestedSubCategoryID)};
+    index = ui->comboBox_category->findData(subcategory.RootID);
+    if(index != -1)
+    {
+        ui->comboBox_category->setCurrentIndex(index);
+        index = ui->comboBox_subcategory->findData(subcategory.ID);
+        if(index != -1)
+        {
+            ui->comboBox_subcategory->setCurrentIndex(index);
+        }
+    }
+}
+
