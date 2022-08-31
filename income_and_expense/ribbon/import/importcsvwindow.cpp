@@ -176,7 +176,6 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
             for(int i = 0; i < subcategories.size(); ++i)
             {
-                qDebug() << "i: " << i;
                 for(const auto & subcategory : subcategories.value(i+1) )
                 {
                     cb_category->addItem(subcategory.Name,subcategory.ID);
