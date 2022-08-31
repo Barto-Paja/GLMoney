@@ -2,6 +2,8 @@
 #include <QVariant>
 #include <QDebug>
 
+#include <algorithm>
+
 Data::Data(QObject *parent) : QObject(parent)
 {
     loadData();
@@ -719,6 +721,62 @@ bool Data::getResume(const QDate &date, QVector<CategoryResume> &resumes, QStrin
     return true;
 }
 
+Payee Data::GetPayee(const int &id) const
+{
+    auto result { std::find_if(m_payees.begin(),m_payees.end(), [&id](const Payee & payee){return payee.ID == id;}) };
+
+    if(result != m_payees.end())
+    {
+        return *result;
+    }
+    else
+    {
+        return Payee();
+    }
+}
+
+SubCategory Data::GetSubCategory(const int &id) const
+{
+    for(const auto & subcategories : m_subCategories)
+    {
+        auto result { std::find_if(subcategories.begin(),subcategories.end(), [&id](const SubCategory & subcategory){ return subcategory.ID == id;})};
+
+        if(result != subcategories.end())
+        {
+            return *result;
+        }
+    }
+
+    return SubCategory();
+}
+
+bool Data::UpdatePayee(const Payee &payee)
+{
+    QString query_text {
+      "UPDATE Payee SET subcategory_id = :subcategory_id "
+        "WHERE payee_id = :payee_id "
+    };
+
+    m_db.transaction();
+
+    QSqlQuery query{m_db};
+    query.prepare(query_text);
+
+    query.bindValue(":subcategory_id",payee.SuggestedSubCategoryID);
+    query.bindValue(":payee_id", payee.ID);
+
+    if(query.exec())
+    {
+        m_db.commit();
+        return true;
+    }
+    else
+    {
+        m_db.rollback();
+        return false;
+    }
+}
+
 bool Data::loadData()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -790,15 +848,17 @@ bool Data::loadMembers()
 bool Data::loadPayees()
 {
     QSqlQuery query{m_db};
-    query.prepare("SELECT p.payee_id, p.name FROM payee p ORDER BY p.name ");
+    query.prepare("SELECT p.payee_id, p.name as payee_name, p.description, p.subcategory_id, s.name as subcategory_name FROM Payee p "
+                  "INNER JOIN Subcategory s ON p.subcategory_id = s.subcategory_id; ");
 
     if(query.exec())
     {
         while (query.next()) {
             m_payees.append(Payee{
                 query.value("payee_id").toInt(),
-                query.value("name").toString(),
-                                0
+                query.value("payee_name").toString(),
+                query.value("subcategory_id").toInt(),
+                query.value("subcategory_name").toString()
             });
         }
 

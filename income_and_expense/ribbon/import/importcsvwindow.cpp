@@ -125,7 +125,10 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
     {
         QTableWidgetItem *newItem;
 
-        QComboBox * cb;
+        QComboBox * cb_payee;
+        QComboBox * cb_member;
+        QComboBox * cb_category;
+
         QCheckBox * chb;
 
         if(m_imported[index].date.isValid())
@@ -142,42 +145,45 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
             newItem->setFlags(newItem->flags() ^ Qt::ItemIsEditable);
             ui->tableWidget->setItem(index,2,newItem);
 
-            cb = new QComboBox();
+            cb_payee = new QComboBox(ui->tableWidget);
+            QObject::connect(cb_payee, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &ImportCSVWindow::catchSignal);
 
             auto payees {m_data->payees()};
 
             for(const auto & payee : payees )
             {
-                cb->addItem(payee.Name ,payee.ID);
+                cb_payee->addItem(payee.Name ,QVariant::fromValue(QPair<int,int>{payee.ID,payee.SuggestedSubCategoryID}));
             }
 
-            ui->tableWidget->setCellWidget(index,3,cb);
+            ui->tableWidget->setCellWidget(index,3,cb_payee);
 
-            cb = new QComboBox();
+            cb_member = new QComboBox();
 
             auto members {m_data->members()};
 
             for(const auto & member : members )
             {
-                cb->addItem(member.Name ,member.ID);
+                cb_member->addItem(member.Name ,member.ID);
             }
 
 
-            ui->tableWidget->setCellWidget(index,4,cb);
+            ui->tableWidget->setCellWidget(index,4,cb_member);
+            m_memberMapper[cb_payee] = QPoint{index,4};
 
-            cb = new QComboBox();
+            cb_category = new QComboBox();
 
             auto subcategories {m_data->subCategories()};
 
             for(int i = 0; i < subcategories.size(); ++i)
             {
-                for(const auto & subcategory : subcategories.value(i) )
+                qDebug() << "i: " << i;
+                for(const auto & subcategory : subcategories.value(i+1) )
                 {
-                    cb->addItem(subcategory.Name,subcategory.ID);
+                    cb_category->addItem(subcategory.Name,subcategory.ID);
                 }
             }
 
-            ui->tableWidget->setCellWidget(index,5,cb);
+            ui->tableWidget->setCellWidget(index,5,cb_category);
 
             newItem = new QTableWidgetItem(" ");
             ui->tableWidget->setItem(index,6,newItem);
@@ -233,7 +239,7 @@ void ImportCSVWindow::on_pushButton_commit_clicked()
             t.multiplicand = 1;
         }
 
-        QComboBox * cb = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(i,3));
+        QComboBox * cb = new QComboBox (ui->tableWidget->cellWidget(i,3));
         t.payeeID = cb->currentData().toInt();
 
         cb = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(i,4));
@@ -277,4 +283,26 @@ void ImportCSVWindow::on_pushButton_commit_clicked()
         return;
     }
 
+}
+
+void ImportCSVWindow::currentIndexChanged(QString txt)
+{
+
+}
+
+void ImportCSVWindow::catchSignal(int index)
+{
+    auto xy = m_memberMapper[dynamic_cast<QComboBox*>(sender())];
+
+    if(xy != QPoint(0,0))
+    {
+        QComboBox *myCB = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(xy.x(),5));
+        auto cd = dynamic_cast<QComboBox*>(sender())->currentData().value<QPair<int,int>>().second;
+        auto idx = myCB->findData(cd);
+
+        if(idx != -1)
+        {
+            myCB->setCurrentIndex(idx);
+        }
+    }
 }

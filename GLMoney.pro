@@ -29,6 +29,7 @@ SOURCES += \
     income_and_expense/ribbon/core/newmemberwindow.cpp \
     income_and_expense/ribbon/core/newpayeewindow.cpp \
     income_and_expense/ribbon/core/newsubcategorywindow.cpp \
+    income_and_expense/ribbon/core/payeeinformationwindow.cpp \
     income_and_expense/ribbon/export/exporttocsvwindow.cpp \
     income_and_expense/ribbon/import/importcsvwindow.cpp \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     income_and_expense/ribbon/core/newmemberwindow.hpp \
     income_and_expense/ribbon/core/newpayeewindow.hpp \
     income_and_expense/ribbon/core/newsubcategorywindow.hpp \
+    income_and_expense/ribbon/core/payeeinformationwindow.hpp \
     income_and_expense/ribbon/export.h \
     income_and_expense/ribbon/export/exporttocsvwindow.hpp \
     income_and_expense/ribbon/import.h \
@@ -62,6 +64,7 @@ HEADERS += \
 
 FORMS += \
     income_and_expense/ribbon/core/addnewcategorywindow.ui \
+    income_and_expense/ribbon/core/payeeinformationwindow.ui \
     income_and_expense/ribbon/export/exporttocsvwindow.ui \
     homebudget/homebudget_form.ui \
     homebudget/monthresume.ui \

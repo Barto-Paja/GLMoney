@@ -54,6 +54,10 @@ private slots:
 
     void on_toolButton_ImportTransactions_clicked();
 
+    void on_pushButton_editPayee_clicked();
+
+    void on_comboBox_payee_currentIndexChanged(int index);
+
 private:
     Ui::IncomesAndExpenses_Form *ui;
 
