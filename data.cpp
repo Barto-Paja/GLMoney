@@ -452,7 +452,7 @@ bool Data::commitHomeBudgetCalculation(HomeBudgetCalculation &home_calc, QVector
 
     for(const auto &i : oneoff)
     {
-        queryText = "INSERT INTO One_off_expense ( name, amount, home_budget_id, category_id ) "
+        queryText = "INSERT INTO One_off_expense ( name, amount, home_budget_id ) "
                     "VALUES "
                     "( :name, :amount, :home_budget_id )";
 

@@ -34,7 +34,6 @@ private slots:
     void on_checkBox_isIncome_stateChanged(int arg1);
     void on_pushButton_Commit_clicked();
     void on_pushButton_Back_clicked();
-    void on_pushButton_dateSelect_clicked();
 
     // Adding new elements
 
@@ -48,14 +47,8 @@ private slots:
 
     // Reports
     void on_toolButton_reportMonth_clicked();
-
-    // Exports
-    void on_toolButton_exportToCSV_clicked();
-
     void on_toolButton_ImportTransactions_clicked();
-
     void on_pushButton_editPayee_clicked();
-
     void on_comboBox_payee_currentIndexChanged(int index);
 
 private:

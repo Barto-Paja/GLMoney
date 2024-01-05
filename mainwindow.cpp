@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->widget_notesIncomeAndExpense = new IncomesAndExpenses_Form(&m_data,ui->widget_notesIncomeAndExpense);
     connect(qobject_cast<IncomesAndExpenses_Form*>(ui->widget_notesIncomeAndExpense),&IncomesAndExpenses_Form::back,this,[&](){ui->stackedWidget->setCurrentIndex(0);});
 
-
 }
 
 MainWindow::~MainWindow()

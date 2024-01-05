@@ -35,14 +35,18 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
     if(m_file.open(QIODevice::ReadOnly))
     {
+        constexpr int columns_required { 7 };
         QStringList wordList;
-        long index = 0;
+
         while (!m_file.atEnd()) {
             QByteArray line = m_file.readLine();
+            line = line.trimmed();
             QList<QByteArray> l = line.split(';');
 
-            if(index > 0)
-            {
+            if(l.size() != columns_required){ continue; }
+
+            //if(index > 0)
+            //{
                 ImportedTransaction t;
                 long j = 0;
                 for(const auto & e : qAsConst(l))
@@ -52,6 +56,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
                     case 0:
                     {
                         t.date = QDate::fromString(e,"yyyy-MM-dd");
+                        if(!t.date.isValid()){continue;}
                         break;
                     }
                     case 1:
@@ -78,8 +83,8 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
 
                 m_imported.append(t);
 
-            }
-            index++;
+            //}
+            //index++;
         }
     }
     else
@@ -238,8 +243,8 @@ void ImportCSVWindow::on_pushButton_commit_clicked()
             t.multiplicand = 1;
         }
 
-        QComboBox * cb = new QComboBox (ui->tableWidget->cellWidget(i,3));
-        t.payeeID = cb->currentData().toInt();
+        QComboBox * cb = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(i,3));
+        t.payeeID = cb->currentData().value<QPair<int,int>>().first;
 
         cb = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(i,4));
         t.memberID = cb->currentData().toInt();
@@ -296,6 +301,7 @@ void ImportCSVWindow::catchSignal(int index)
     if(xy != QPoint(0,0))
     {
         QComboBox *myCB = qobject_cast<QComboBox*>(ui->tableWidget->cellWidget(xy.x(),5));
+        qDebug() << dynamic_cast<QComboBox*>(sender())->currentData().value<QPair<int,int>>().first;
         auto cd = dynamic_cast<QComboBox*>(sender())->currentData().value<QPair<int,int>>().second;
         auto idx = myCB->findData(cd);
 

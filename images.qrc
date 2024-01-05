@@ -12,5 +12,12 @@
         <file>images/minus-square.png</file>
         <file>images/plus-sign.png</file>
         <file>images/import.png</file>
+        <file>images/add-subcategory.png</file>
+        <file>images/add-category.png</file>
+        <file>images/wallet.png</file>
+        <file>images/wallet-2.png</file>
+        <file>images/wallet-3.png</file>
+        <file>images/csv-import.png</file>
+        <file>images/home.png</file>
     </qresource>
 </RCC>

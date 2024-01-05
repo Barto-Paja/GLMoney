@@ -26,6 +26,8 @@ private slots:
 
     void on_pushButton_Quit_clicked();
 
+    void on_pushButton_About_clicked();
+
 private:
     Ui::MainMenu *ui;
 };

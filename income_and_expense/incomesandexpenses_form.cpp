@@ -14,9 +14,10 @@ IncomesAndExpenses_Form::IncomesAndExpenses_Form(Data *data, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->calendarWidget->hide();
+    //ui->calendarWidget->hide();
+    ui->calendarWidget->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
     ui->lineEdit_amount->setStyleSheet("background-color: #F0685B; color: #57201B");
-    ui->dateEdit->setDate(QDate::currentDate());
+    //ui->dateEdit->setDate(QDate::currentDate());
     ui->lineEdit_amount->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
     FillComboboxes();
@@ -37,7 +38,8 @@ void IncomesAndExpenses_Form::on_comboBox_category_currentIndexChanged(int index
 
 void IncomesAndExpenses_Form::on_calendarWidget_clicked(const QDate &date)
 {
-    ui->dateEdit->setDate(date);
+    //ui->dateEdit->setDate(date);
+    ui->label_dt_selected->setText(date.toString());
 }
 
 void IncomesAndExpenses_Form::on_checkBox_isIncome_stateChanged(int arg1)
@@ -73,7 +75,7 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
     if(ui->checkBox_isIncome->isChecked())
     {
         if(m_data->addTransaction(newTransaction{
-                                      ui->dateEdit->date(),
+                                      ui->calendarWidget->selectedDate(),
                                       ui->comboBox_payee->currentData().toInt(),
                                       QLocale::system().toDouble(ui->lineEdit_amount->text()),
                                       ui->comboBox_subcategory->currentData().toInt(),
@@ -105,7 +107,7 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
         if(m_data->addTransaction(
                 newTransaction
                 {
-                    ui->dateEdit->date(),
+                    ui->calendarWidget->selectedDate(),
                     ui->comboBox_payee->currentData().toInt(),
                     QLocale::system().toDouble(ui->lineEdit_amount->text()),
                     ui->comboBox_subcategory->currentData().toInt(),
@@ -122,6 +124,7 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
             msg.exec();
 
             ui->textEdit->clear();
+            ui->textEdit_2->append(QDateTime::currentDateTime().toString() + ": Dodano transakcję -" + QString::number(QLocale::system().toDouble(ui->lineEdit_amount->text())));
         }
         else
         {
@@ -137,18 +140,6 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
 void IncomesAndExpenses_Form::on_pushButton_Back_clicked()
 {
     emit back();
-}
-
-void IncomesAndExpenses_Form::on_pushButton_dateSelect_clicked()
-{
-    if(ui->calendarWidget->isHidden())
-    {
-        ui->calendarWidget->show();
-    }
-    else
-    {
-        ui->calendarWidget->hide();
-    }
 }
 
 // -- Tab Widget
@@ -203,13 +194,6 @@ void IncomesAndExpenses_Form::on_toolButton_reportMonth_clicked()
 void IncomesAndExpenses_Form::on_toolButton_makeTransactionsBetweenAccounts_clicked()
 {
     MakeTransactionsBetweenAccounts * dialog = new MakeTransactionsBetweenAccounts(m_data);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
-}
-
-void IncomesAndExpenses_Form::on_toolButton_exportToCSV_clicked()
-{
-    ExportToCSVWindow * dialog = new ExportToCSVWindow(m_data);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
