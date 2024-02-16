@@ -60,7 +60,7 @@ bool ExportToCSVWindow::exportToCSV()
                                           m_transactions,error_msg))
         {
             QTextStream stream{&file};
-            stream.setCodec("UTF-8");
+            stream.setEncoding(QStringConverter::Utf8);
             QLocale locale { QLocale::Polish };
             int index = 1;
             for(auto & i : m_transactions)

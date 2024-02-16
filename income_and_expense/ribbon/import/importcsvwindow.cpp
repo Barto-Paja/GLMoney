@@ -1,7 +1,7 @@
 #include "importcsvwindow.hpp"
 #include "ui_importcsvwindow.h"
-#include <QTextCodec>
 #include <QCheckBox>
+// #include <QTextCodec>
 
 ImportCSVWindow::ImportCSVWindow(Data *data, QWidget *parent) :
     QDialog(parent),
@@ -49,7 +49,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
             //{
                 ImportedTransaction t;
                 long j = 0;
-                for(const auto & e : qAsConst(l))
+                for(const auto & e : std::as_const(l))
                 {
                     switch(j)
                     {
@@ -61,7 +61,7 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
                     }
                     case 1:
                     {
-                        t.description = QTextCodec::codecForName("Windows-1250")->toUnicode(e);
+                        t.description = e; //QTextCodec::codecForName("Windows-1250")->toUnicode(e);
                         break;
                     }
                     case 4:
