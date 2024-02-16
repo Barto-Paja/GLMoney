@@ -92,6 +92,7 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
             msg.exec();
 
             ui->textEdit->clear();
+            ui->plainTextEdit_2->appendPlainText(QDateTime::currentDateTime().toString() + ": Dodano transakcję -" + QString::number(QLocale::system().toDouble(ui->lineEdit_amount->text())));
         }
         else
         {
@@ -124,7 +125,7 @@ void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
             msg.exec();
 
             ui->textEdit->clear();
-            ui->textEdit_2->append(QDateTime::currentDateTime().toString() + ": Dodano transakcję -" + QString::number(QLocale::system().toDouble(ui->lineEdit_amount->text())));
+            ui->plainTextEdit_2->appendPlainText(QDateTime::currentDateTime().toString() + ": Dodano transakcję -" + QString::number(QLocale::system().toDouble(ui->lineEdit_amount->text())));
         }
         else
         {
