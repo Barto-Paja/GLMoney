@@ -740,7 +740,7 @@ transakcje z csv</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QTextEdit" name="textEdit_2">
+           <widget class="QPlainTextEdit" name="plainTextEdit_2">
             <property name="maximumSize">
              <size>
               <width>16777215</width>
