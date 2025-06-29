@@ -21,6 +21,8 @@ IncomesAndExpenses_Form::IncomesAndExpenses_Form(Data *data, QWidget *parent) :
     ui->lineEdit_amount->setValidator(new QDoubleValidator(0,1000000.00,2,this));
 
     FillComboboxes();
+
+    ui->comboBox_payee->setInsertPolicy(QComboBox::NoInsert);
 }
 
 IncomesAndExpenses_Form::~IncomesAndExpenses_Form()
@@ -58,6 +60,22 @@ void IncomesAndExpenses_Form::on_checkBox_isIncome_stateChanged(int arg1)
 
 void IncomesAndExpenses_Form::on_pushButton_Commit_clicked()
 {
+    constexpr int strings_are_equal { 0 };
+    if( QString::compare(ui->comboBox_payee->currentText(),
+                         ui->comboBox_payee->itemText(ui->comboBox_payee->currentIndex()),
+                         Qt::CaseSensitivity::CaseSensitive
+                         ) != strings_are_equal
+        )
+    {
+        QMessageBox msg;
+        msg.setIcon(QMessageBox::Critical);
+        msg.setText("Nie znaleziono kontrahenta o podanej nazwie: " + ui->comboBox_payee->currentText());
+        msg.addButton(QMessageBox::Ok);
+        msg.exec();
+
+        return;
+    }
+
 
     if(ui->lineEdit_amount->text().isEmpty())
     {

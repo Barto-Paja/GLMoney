@@ -95,3 +95,9 @@ void PayeeInformationWindow::on_pushButton_save_clicked()
     }
 }
 
+
+void PayeeInformationWindow::on_pushButton_cancel_clicked()
+{
+    close();
+}
+
