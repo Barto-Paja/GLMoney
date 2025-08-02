@@ -850,6 +850,7 @@ bool Data::loadPayees()
     QSqlQuery query{m_db};
     query.prepare("SELECT p.payee_id, p.name as payee_name, p.description, p.subcategory_id, s.name as subcategory_name FROM Payee p "
                   "INNER JOIN Subcategory s ON p.subcategory_id = s.subcategory_id "
+                  "WHERE p.is_visible = 1 "
                   "ORDER BY p.name;");
 
     if(query.exec())

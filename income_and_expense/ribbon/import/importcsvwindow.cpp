@@ -66,12 +66,14 @@ void ImportCSVWindow::on_pushButton_importFile_clicked()
                     }
                     case 4:
                     {
-                        auto s = e;
-                        long p = s.lastIndexOf(' ');
+                        auto s = QString::fromUtf8(e);
+                        s.remove("PLN", Qt::CaseInsensitive);
+                        s.replace(" ", "");
+                        s.remove('"');
 
                         QLocale pl(QLocale::Polish);
 
-                        t.amount = pl.toDouble(s.left(p));
+                        t.amount = pl.toDouble(s.trimmed());
                         break;
                     }
                     default:
