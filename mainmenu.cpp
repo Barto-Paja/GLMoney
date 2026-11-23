@@ -45,3 +45,9 @@ void MainMenu::on_pushButton_About_clicked()
     msg.exec();
 }
 
+
+void MainMenu::on_pushButton_Report_clicked()
+{
+    emit menuItem(3);
+}
+

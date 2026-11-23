@@ -777,6 +777,211 @@ bool Data::UpdatePayee(const Payee &payee)
     }
 }
 
+bool Data::getPayeeMonthlyReport(int payeeID, const QDate &start, const QDate &end, QVector<PayeeMonthlyReport> &report, QString &error)
+{
+    report.clear();
+    error.clear();
+
+    if (!start.isValid() || !end.isValid() || start > end) {
+        error = "Nieprawidłowy zakres dat.";
+        return false;
+    }
+
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+    WITH RECURSIVE months(month_date) AS (
+        SELECT date(:start, 'start of month')
+
+        UNION ALL
+
+        SELECT date(month_date, '+1 month')
+        FROM months
+        WHERE month_date < date(:end, 'start of month')
+    ),
+
+    monthly_transactions AS (
+        SELECT
+            strftime('%Y-%m', "when") AS month,
+
+            SUM(CASE
+                WHEN multiplicand > 0 THEN amount
+                ELSE 0
+            END) AS income,
+
+            SUM(CASE
+                WHEN multiplicand < 0 THEN amount
+                ELSE 0
+            END) AS expenses,
+
+            SUM(amount * multiplicand) AS balance
+
+        FROM [Transaction]
+
+        WHERE payee_id = :payeeID
+          AND date("when") >= date(:start)
+          AND date("when") <= date(:end)
+
+        GROUP BY strftime('%Y-%m', "when")
+    )
+
+    SELECT
+        CAST(strftime('%Y', months.month_date) AS INTEGER) AS year,
+        CAST(strftime('%m', months.month_date) AS INTEGER) AS month,
+
+        COALESCE(monthly_transactions.income, 0) AS income,
+        COALESCE(monthly_transactions.expenses, 0) AS expenses,
+        COALESCE(monthly_transactions.balance, 0) AS balance
+
+    FROM months
+
+    LEFT JOIN monthly_transactions
+        ON monthly_transactions.month = strftime('%Y-%m', months.month_date)
+
+    ORDER BY months.month_date
+    )");
+
+    query.bindValue(":payeeID", payeeID);
+    query.bindValue(":start", start.toString(Qt::ISODate));
+    query.bindValue(":end", end.toString(Qt::ISODate));
+
+    if (!query.exec()) {
+        error = query.lastError().text();
+        return false;
+    }
+
+    while (query.next()) {
+        PayeeMonthlyReport item;
+
+        item.year = query.value("year").toInt();
+        item.month = query.value("month").toInt();
+        item.income = query.value("income").toDouble();
+        item.expenses = query.value("expenses").toDouble();
+        item.balance = query.value("balance").toDouble();
+
+        report.append(item);
+    }
+
+    return true;
+}
+
+bool Data::getExpenseBreakdown(const QDate &start, const QDate &end, QVector<CategoryExpenseReport> &report, double &totalExpenses, QString &error)
+{
+    report.clear();
+    totalExpenses = 0.0;
+    error.clear();
+
+    if (!start.isValid() || !end.isValid() || start > end) {
+        error = "Nieprawidłowy zakres dat.";
+        return false;
+    }
+
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        SELECT
+            c.category_id AS category_id,
+            c.name AS category_name,
+
+            s.subcategory_id AS subcategory_id,
+            s.name AS subcategory_name,
+
+            SUM(t.amount) AS amount
+
+        FROM [Transaction] t
+
+        INNER JOIN Subcategory s
+            ON s.subcategory_id = t.category_id
+
+        INNER JOIN Category c
+            ON c.category_id = s.category_id
+
+        WHERE t.multiplicand < 0
+          AND date(t."when") >= date(:start)
+          AND date(t."when") <= date(:end)
+
+        GROUP BY
+            c.category_id,
+            c.name,
+            s.subcategory_id,
+            s.name
+
+        ORDER BY
+            c.name,
+            s.name
+    )");
+
+    query.bindValue(":start", start.toString(Qt::ISODate));
+    query.bindValue(":end", end.toString(Qt::ISODate));
+
+    if (!query.exec()) {
+        error = query.lastError().text();
+        return false;
+    }
+
+    // Najpierw zbieramy podkategorie i obliczamy sumy kategorii.
+    QMap<int, int> categoryIndexes;
+
+    while (query.next()) {
+        const int categoryID = query.value("category_id").toInt();
+        const int subcategoryID = query.value("subcategory_id").toInt();
+
+        const QString categoryName = query.value("category_name").toString();
+        const QString subcategoryName = query.value("subcategory_name").toString();
+
+        const double amount = query.value("amount").toDouble();
+
+        int categoryIndex;
+
+        if (!categoryIndexes.contains(categoryID)) {
+            CategoryExpenseReport category;
+
+            category.ID = categoryID;
+            category.Name = categoryName;
+            category.Amount = 0.0;
+            category.Percent = 0.0;
+
+            report.append(category);
+
+            categoryIndex = report.size() - 1;
+            categoryIndexes.insert(categoryID, categoryIndex);
+        } else {
+            categoryIndex = categoryIndexes.value(categoryID);
+        }
+
+        SubcategoryExpenseReport subcategory;
+
+        subcategory.ID = subcategoryID;
+        subcategory.Name = subcategoryName;
+        subcategory.Amount = amount;
+        subcategory.Percent = 0.0;
+
+        report[categoryIndex].Subcategories.append(subcategory);
+
+        report[categoryIndex].Amount += amount;
+        totalExpenses += amount;
+    }
+
+    // Obliczamy procentowy udział kategorii i podkategorii.
+    for (CategoryExpenseReport &category : report) {
+
+        if (totalExpenses > 0.0) {
+            category.Percent =
+                (category.Amount / totalExpenses) * 100.0;
+        }
+
+        for (SubcategoryExpenseReport &subcategory : category.Subcategories) {
+
+            if (totalExpenses > 0.0) {
+                subcategory.Percent =
+                    (subcategory.Amount / totalExpenses) * 100.0;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool Data::loadData()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");

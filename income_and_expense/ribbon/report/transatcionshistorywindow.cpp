@@ -112,3 +112,9 @@ void TransatcionsHistoryWindow::on_comboBox_accounts_currentIndexChanged(int ind
     currentAccountSelected = ui->comboBox_accounts->currentData().toInt();
     fillTable();
 }
+
+void TransatcionsHistoryWindow::on_pushButton_home_clicked()
+{
+    emit backToAnalytics();
+}
+

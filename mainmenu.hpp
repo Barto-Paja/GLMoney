@@ -28,6 +28,8 @@ private slots:
 
     void on_pushButton_About_clicked();
 
+    void on_pushButton_Report_clicked();
+
 private:
     Ui::MainMenu *ui;
 };

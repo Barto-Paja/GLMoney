@@ -95,6 +95,9 @@ public:
 
     bool UpdatePayee(const Payee & payee);
 
+    bool getPayeeMonthlyReport(int payeeID, const QDate &start, const QDate &end, QVector<PayeeMonthlyReport> &report, QString &error);
+    bool getExpenseBreakdown(const QDate &start, const QDate &end, QVector<CategoryExpenseReport> &report, double &totalExpenses,QString &error);
+
 
 signals:
 

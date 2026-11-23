@@ -21,6 +21,11 @@ private slots:
 
     void on_comboBox_accounts_currentIndexChanged(int index);
 
+    void on_pushButton_home_clicked();
+
+signals:
+    void backToAnalytics();
+
 private:
     Ui::TransatcionsHistoryWindow *ui;
 

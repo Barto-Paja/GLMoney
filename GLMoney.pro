@@ -33,6 +33,8 @@ SOURCES += \
     income_and_expense/ribbon/core/payeeinformationwindow.cpp \
     income_and_expense/ribbon/export/exporttocsvwindow.cpp \
     income_and_expense/ribbon/import/importcsvwindow.cpp \
+    income_and_expense/ribbon/report/expensereportwindow.cpp \
+    income_and_expense/ribbon/report/payeereportwindow.cpp \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.cpp \
     income_and_expense/ribbon/report/transatcionshistorywindow.cpp \
     main.cpp \
@@ -57,6 +59,8 @@ HEADERS += \
     income_and_expense/ribbon/import.h \
     income_and_expense/ribbon/import/importcsvwindow.hpp \
     income_and_expense/ribbon/report.h \
+    income_and_expense/ribbon/report/expensereportwindow.hpp \
+    income_and_expense/ribbon/report/payeereportwindow.hpp \
     income_and_expense/ribbon/utils.h \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.hpp \
     income_and_expense/ribbon/report/transatcionshistorywindow.hpp \
@@ -71,6 +75,8 @@ FORMS += \
     homebudget/monthresume.ui \
     income_and_expense/incomesandexpenses_form.ui \
     income_and_expense/ribbon/import/importcsvwindow.ui \
+    income_and_expense/ribbon/report/expensereportwindow.ui \
+    income_and_expense/ribbon/report/payeereportwindow.ui \
     mainmenu.ui \
     mainwindow.ui \
     income_and_expense/ribbon/utils/maketransactionsbetweenaccounts.ui \

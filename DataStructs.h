@@ -256,4 +256,31 @@ struct CategoryResume
     ~CategoryResume() = default;
 };
 
+struct PayeeMonthlyReport
+{
+    int year {0};
+    int month {0};
+    double income {0.0};
+    double expenses {0.0};
+    double balance {0.0};
+};
+
+struct SubcategoryExpenseReport
+{
+    int ID {0};
+    QString Name;
+    double Amount {0.0};
+    double Percent {0.0};
+};
+
+struct CategoryExpenseReport
+{
+    int ID {0};
+    QString Name;
+    double Amount {0.0};
+    double Percent {0.0};
+
+    QVector<SubcategoryExpenseReport> Subcategories;
+};
+
 #endif // DATASTRUCTS_H
